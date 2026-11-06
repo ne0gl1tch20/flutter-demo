@@ -4,8 +4,8 @@ import 'package:flutter_lab/app.dart';
 
 void main() {
   testWidgets('home screen exposes the Flutter capability catalog', (tester) async {
-    await tester.view.setPhysicalSize(const Size(1200, 1800));
-    await tester.view.setDevicePixelRatio(1);
+    await tester.view.physicalSize = const Size(1200, 1800);
+    await tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
