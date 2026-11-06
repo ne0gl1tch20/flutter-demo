@@ -51,6 +51,10 @@ jobs:
         run: sed -i '/<manifest/a\    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>' android/app/src/main/AndroidManifest.xml
       - name: Set Android app label
         run: sed -i 's/android:label="flutterlab"/android:label="Flutter Lab"/' android/app/src/main/AndroidManifest.xml
+      - name: Enable Android core library desugaring
+        run: |
+          sed -i '/compileOptions {/a\        isCoreLibraryDesugaringEnabled = true' android/app/build.gradle.kts
+          printf '\ndependencies {\n    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")\n}\n' >> android/app/build.gradle.kts
       - name: Install dependencies
         run: flutter pub get
       - name: Build release APK
