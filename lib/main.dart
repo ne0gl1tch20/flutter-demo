@@ -101,10 +101,10 @@ class _GesturePageState extends State<GesturePage> {
   Widget build(BuildContext context)=>LabScaffold(title:'Gesture Playground',description:'Move the glowing tile around. Tap it to count interactions.',child:DemoCard(title:'Drag + tap',child:Column(children:[
     SizedBox(height:280,child:LayoutBuilder(builder:(context,c)=>Stack(children:[
       Positioned.fill(child:DecoratedBox(decoration:BoxDecoration(color:ink,borderRadius:BorderRadius.circular(18)))),
-      Positioned(left:(c.maxWidth-76)/2+offset.dx,top:102+offset.dy,child:GestureDetector(onPanUpdate:(d)=>setState(()=>offset=Offset((offset.dx+d.delta.dx).clamp(-c.maxWidth/2+38,c.maxWidth/2-38),(offset.dy+d.delta.dy).clamp(-102,102))),onTap:()=>setState(()=>taps++),child:Container(width:76,height:76,decoration:BoxDecoration(gradient:const LinearGradient(colors:[violet,mint]),borderRadius:BorderRadius.circular(25),boxShadow:[BoxShadow(color:violet.withValues(alpha:.3),blurRadius:22)]),child:const Icon(Icons.open_with_rounded,color:ink,size:32)))),
+      Positioned(left:(c.maxWidth-76)/2+offset.dx,top:102+offset.dy,child:GestureDetector(onPanUpdate:(d)=>setState(()=>offset=Offset((offset.dx+d.delta.dx).clamp(-c.maxWidth/2+38,c.maxWidth/2-38).toDouble(),(offset.dy+d.delta.dy).clamp(-102,102).toDouble())),onTap:()=>setState(()=>taps++),child:Container(width:76,height:76,decoration:BoxDecoration(gradient:const LinearGradient(colors:[violet,mint]),borderRadius:BorderRadius.circular(25),boxShadow:[BoxShadow(color:violet.withValues(alpha:.3),blurRadius:22)]),child:const Icon(Icons.open_with_rounded,color:ink,size:32)))),
     ]))),
     const SizedBox(height:12),Text('Tapped $taps times',style:const TextStyle(color:mint,fontWeight:FontWeight.w700)),
-    TextButton(onPressed:()=>setState(()=>{offset=Offset.zero,taps=0}),child:const Text('Reset playground')),
+    TextButton(onPressed:()=>setState(() { offset=Offset.zero; taps=0; }),child:const Text('Reset playground')),
   ])));
 }
 
