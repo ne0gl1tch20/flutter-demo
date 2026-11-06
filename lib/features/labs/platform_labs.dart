@@ -8,6 +8,58 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:share_plus/share_plus.dart';
 
+class PlatformLabPage extends StatelessWidget {
+  const PlatformLabPage({
+    required this.title,
+    required this.description,
+    required this.child,
+    super.key,
+  });
+
+  final String title;
+  final String description;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(title: Text(title)),
+        body: ListView(
+          padding: const EdgeInsets.all(20),
+          children: [
+            Text(description),
+            const SizedBox(height: 20),
+            child,
+          ],
+        ),
+      );
+}
+
+class PlatformLabCardPanel extends StatelessWidget {
+  const PlatformLabCardPanel({
+    required this.title,
+    required this.child,
+    super.key,
+  });
+
+  final String title;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => Card(
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 16),
+              child,
+            ],
+          ),
+        ),
+      );
+}
+
 class PlatformExtrasLab extends StatefulWidget {
   const PlatformExtrasLab({super.key});
 
@@ -56,13 +108,13 @@ class _PlatformExtrasLabState extends State<PlatformExtrasLab> {
   }
 
   @override
-  Widget build(BuildContext context) => LabPage(
+  Widget build(BuildContext context) => PlatformLabPage(
         title: 'Platform Tools',
         description:
             'Try native image capture, system file picking, sharing and clipboard access. Some actions are platform-specific.',
         child: Column(
           children: [
-            LabCardPanel(
+            PlatformLabCardPanel(
               title: 'Camera and gallery',
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,7 +162,7 @@ class _PlatformExtrasLabState extends State<PlatformExtrasLab> {
               ),
             ),
             const SizedBox(height: 12),
-            LabCardPanel(
+            PlatformLabCardPanel(
               title: 'System file picker',
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,7 +177,7 @@ class _PlatformExtrasLabState extends State<PlatformExtrasLab> {
               ),
             ),
             const SizedBox(height: 12),
-            LabCardPanel(
+            PlatformLabCardPanel(
               title: 'Share sheet',
               child: Wrap(
                 spacing: 8,
@@ -156,7 +208,7 @@ class _PlatformExtrasLabState extends State<PlatformExtrasLab> {
               ),
             ),
             const SizedBox(height: 12),
-            LabCardPanel(
+            PlatformLabCardPanel(
               title: 'Haptic feedback',
               child: Wrap(
                 spacing: 8,
@@ -233,11 +285,11 @@ class _AudioLabState extends State<AudioLab> {
   }
 
   @override
-  Widget build(BuildContext context) => LabPage(
+  Widget build(BuildContext context) => PlatformLabPage(
         title: 'Audio Lab',
         description:
             'Play and stop a short sound over HTTPS using an audio plugin. Internet access is required.',
-        child: LabCardPanel(
+        child: PlatformLabCardPanel(
           title: 'Audio playback',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -330,11 +382,11 @@ class _NotificationsLabState extends State<NotificationsLab> {
   }
 
   @override
-  Widget build(BuildContext context) => LabPage(
+  Widget build(BuildContext context) => PlatformLabPage(
         title: 'Notifications Lab',
         description:
             'Initialize the Android notification plugin, request permission and send a local notification.',
-        child: LabCardPanel(
+        child: PlatformLabCardPanel(
           title: 'Local notifications',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
