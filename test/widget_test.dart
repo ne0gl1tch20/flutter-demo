@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_lab/main.dart';
+import 'package:flutter_lab/app.dart';
 
 void main() {
   testWidgets('home screen exposes the Flutter capability catalog', (tester) async {
@@ -34,9 +34,10 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(const FlutterLabApp());
-    await tester.tap(find.text('Animation Studio'));
+    await tester.tap(find.text('UI Studio'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Explicit animation controller'), findsOneWidget);
+    expect(find.text('Button styles'), findsOneWidget);
+    expect(find.text('Live controls'), findsOneWidget);
   });
 }
