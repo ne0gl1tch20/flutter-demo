@@ -19,10 +19,43 @@ An interactive playground for exploring Flutter capabilities on Android and Wind
 - **Platform Tools** — camera/gallery capture, file picking, sharing, clipboard and haptics.
 - **Audio Lab** — online audio playback and stop controls.
 - **Notifications Lab** — Android notification permission and local notifications.
+- **Concurrency Lab** — CPU-heavy prime counting on a background Dart isolate.
+- **App Lifecycle Lab** — observe pause, resume and other lifecycle transitions.
+- **Keyboard & Shortcuts Lab** — hardware keyboard input, Shortcuts and Actions.
+- **Localization & Formatting Lab** — English, Filipino and Spanish copy with locale-aware dates and PHP currency.
+- **Forms & Validation Lab** — form state, input types, validation and focus handling.
+- **Drag & Drop Lab** — draggable widgets, drop targets and reorderable lists.
+- **Streams & Async Lab** — asynchronous event streams and StreamBuilder.
 
 ## Platforms
 
 The project targets Android and Windows. Platform projects are generated in CI from the Flutter SDK so the repository stays focused on the shared Dart application.
+
+
+## Platform support
+
+| Capability | Android | Windows |
+|---|---|---|
+| Material UI, animation, graphics and adaptive layouts | Yes | Yes |
+| Keyboard shortcuts and drag-and-drop | Touch + hardware keyboard | Yes |
+| Device information | Yes | Yes |
+| Accelerometer | Device-dependent | Hardware-dependent |
+| Camera and gallery picker | Yes | Not included |
+| File picker, clipboard and share sheet | Yes | Yes |
+| Haptic feedback | Device-dependent | Platform-dependent |
+| Local notifications | Yes | Not included in this demo |
+| Audio and HTTP examples | Internet required | Internet required |
+| Isolates, streams, forms and localization | Yes | Yes |
+
+Some capabilities depend on the operating system, hardware, permissions or an internet connection. The labs show the API integration and handle unsupported platform actions with a message where applicable.
+
+## CI artifacts
+
+Pushes to `main` run formatting, static analysis and widget tests before building:
+- Android release APK (`flutter-lab-android`)
+- Windows release bundle (`flutter-lab-windows`)
+
+GitHub Actions artifacts are retained for 7 days.
 
 ## Run locally
 
