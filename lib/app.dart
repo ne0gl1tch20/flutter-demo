@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'features/labs/labs.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class FlutterLabApp extends StatefulWidget {
   const FlutterLabApp({super.key});
