@@ -16,6 +16,9 @@ An interactive playground for exploring Flutter capabilities on Android and Wind
 - **Network Lab** — HTTPS requests and JSON decoding.
 - **Accessibility Lab** — Semantics, scalable text and high-contrast previews.
 - **Performance Lab** — rebuild counters, RepaintBoundary and custom-painted particles.
+- **Platform Tools** — camera/gallery capture, file picking, sharing, clipboard and haptics.
+- **Audio Lab** — online audio playback and stop controls.
+- **Notifications Lab** — Android notification permission and local notifications.
 
 ## Platforms
 
@@ -60,4 +63,4 @@ flutter test
 - Android application ID: `com.jarrlyyy.flutterlab`
 - Windows runner name: `flutterlab`
 
-Some labs use plugins and native platform APIs. Device features depend on hardware, operating-system support and permissions. The network lab requires an internet connection.
+Some labs use plugins and native platform APIs. Device features depend on hardware, operating-system support and permissions. The network and audio labs require an internet connection. Camera/gallery capture is mobile-only. Local notifications are currently demonstrated on Android.
