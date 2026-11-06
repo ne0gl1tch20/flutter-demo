@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'features/labs/labs.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -287,6 +288,12 @@ class _HomeShellState extends State<HomeShell> {
           leading: Icon(Icons.code),
           title: Text('Built with Flutter'),
           subtitle: Text('Material 3, Dart, plugins and custom rendering.'),
+        ),
+        const SizedBox(height: 12),
+        FilledButton.icon(
+          onPressed: () => launchUrl(Uri.https('docs.flutter.dev', '')),
+          icon: const Icon(Icons.open_in_new),
+          label: const Text('Explore Flutter documentation'),
         ),
       ],
     );
