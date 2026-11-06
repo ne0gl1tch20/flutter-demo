@@ -28,6 +28,10 @@ void main() {
     expect(find.text('Platform Tools'), findsOneWidget);
     expect(find.text('Audio Lab'), findsOneWidget);
     expect(find.text('Notifications Lab'), findsOneWidget);
+    expect(find.text('Concurrency Lab'), findsOneWidget);
+    expect(find.text('App Lifecycle Lab'), findsOneWidget);
+    expect(find.text('Keyboard & Shortcuts Lab'), findsOneWidget);
+    expect(find.text('Localization & Formatting Lab'), findsOneWidget);
   });
 
   testWidgets('a capability card opens its lab', (tester) async {
