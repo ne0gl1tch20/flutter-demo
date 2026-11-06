@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
 
+import 'advanced_labs.dart';
 import 'platform_labs.dart';
 
 import 'package:device_info_plus/device_info_plus.dart';
@@ -46,6 +47,10 @@ final labCatalog = <LabDefinition>[
   LabDefinition(title: 'Platform Tools', description: 'Camera, gallery, files, sharing, clipboard and haptics.', category: 'Platform', icon: Icons.phone_android_rounded, color: const Color(0xFF8ED7B2), builder: (_) => const PlatformExtrasLab()),
   LabDefinition(title: 'Audio Lab', description: 'Play and control audio using a Flutter plugin.', category: 'Media', icon: Icons.graphic_eq_rounded, color: const Color(0xFFFFA875), builder: (_) => const AudioLab()),
   LabDefinition(title: 'Notifications Lab', description: 'Request permission and send local Android notifications.', category: 'Platform', icon: Icons.notifications_active_rounded, color: const Color(0xFFFFD166), builder: (_) => const NotificationsLab()),
+  LabDefinition(title: 'Concurrency Lab', description: 'Run CPU-heavy work on a background Dart isolate.', category: 'Performance', icon: Icons.memory_rounded, color: const Color(0xFF7EB8FF), builder: (_) => const IsolateLab()),
+  LabDefinition(title: 'App Lifecycle Lab', description: 'Observe app pause, resume and lifecycle events.', category: 'Platform', icon: Icons.sync_rounded, color: const Color(0xFF80D6A8), builder: (_) => const LifecycleLab()),
+  LabDefinition(title: 'Keyboard & Shortcuts Lab', description: 'Handle hardware keyboard input and custom shortcuts.', category: 'Desktop', icon: Icons.keyboard_rounded, color: const Color(0xFFFFC66D), builder: (_) => const KeyboardLab()),
+  LabDefinition(title: 'Localization & Formatting Lab', description: 'Switch languages and format dates and Philippine peso values.', category: 'Internationalization', icon: Icons.translate_rounded, color: const Color(0xFFFFA7C8), builder: (_) => const LocalizationLab()),
 ];
 
 class LabPage extends StatelessWidget {
