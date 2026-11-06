@@ -51,6 +51,9 @@ final labCatalog = <LabDefinition>[
   LabDefinition(title: 'App Lifecycle Lab', description: 'Observe app pause, resume and lifecycle events.', category: 'Platform', icon: Icons.sync_rounded, color: const Color(0xFF80D6A8), builder: (_) => const LifecycleLab()),
   LabDefinition(title: 'Keyboard & Shortcuts Lab', description: 'Handle hardware keyboard input and custom shortcuts.', category: 'Desktop', icon: Icons.keyboard_rounded, color: const Color(0xFFFFC66D), builder: (_) => const KeyboardLab()),
   LabDefinition(title: 'Localization & Formatting Lab', description: 'Switch languages and format dates and Philippine peso values.', category: 'Internationalization', icon: Icons.translate_rounded, color: const Color(0xFFFFA7C8), builder: (_) => const LocalizationLab()),
+  LabDefinition(title: 'Forms & Validation Lab', description: 'Build forms with input types, validation and focus handling.', category: 'Input', icon: Icons.assignment_rounded, color: const Color(0xFF9B8CFF), builder: (_) => const FormsLab()),
+  LabDefinition(title: 'Drag & Drop Lab', description: 'Reorder lists and move draggable widgets into drop targets.', category: 'Interaction', icon: Icons.open_with_rounded, color: const Color(0xFF75E0C1), builder: (_) => const DragDropLab()),
+  LabDefinition(title: 'Streams & Async Lab', description: 'Receive asynchronous events and render them with StreamBuilder.', category: 'State', icon: Icons.stream_rounded, color: const Color(0xFF7EB8FF), builder: (_) => const StreamsLab()),
 ];
 
 class LabPage extends StatelessWidget {
