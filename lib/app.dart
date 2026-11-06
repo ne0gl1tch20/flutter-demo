@@ -3,11 +3,6 @@ import 'package:flutter/material.dart';
 import 'features/labs/labs.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(const FlutterLabApp());
-}
-
 class FlutterLabApp extends StatefulWidget {
   const FlutterLabApp({super.key});
 
