@@ -19,7 +19,6 @@ class _PlatformExtrasLabState extends State<PlatformExtrasLab> {
   final ImagePicker _imagePicker = ImagePicker();
   XFile? _image;
   String _fileMessage = 'No file selected.';
-  bool _busy = false;
 
   Future<void> _pickImage(ImageSource source) async {
     if (!Platform.isAndroid && !Platform.isIOS) {
