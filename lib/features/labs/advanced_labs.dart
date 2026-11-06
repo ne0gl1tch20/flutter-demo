@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -443,9 +444,8 @@ class _DragDropLabState extends State<DragDropLab> {
               child: ReorderableListView(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                onReorder: (oldIndex, newIndex) {
+                onReorderItem: (oldIndex, newIndex) {
                   setState(() {
-                    if (newIndex > oldIndex) newIndex--;
                     final item = _items.removeAt(oldIndex);
                     _items.insert(newIndex, item);
                   });
