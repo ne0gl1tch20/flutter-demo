@@ -31,8 +31,8 @@ void main() {
   });
 
   testWidgets('a capability card opens its lab', (tester) async {
-    tester.view.physicalSize = const Size(1200, 1800));
-    tester.view.devicePixelRatio = 1);
+    tester.view.physicalSize = const Size(1200, 1800);
+    tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
