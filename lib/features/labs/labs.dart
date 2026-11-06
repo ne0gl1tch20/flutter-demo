@@ -9,7 +9,6 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class LabDefinition {
   const LabDefinition({
@@ -193,10 +192,10 @@ class _GestureLabState extends State<GestureLab> {
                   onTap: () => setState(() => taps++),
                   onLongPress: () => setState(() => longPresses++),
                   onScaleUpdate: (details) => setState(() {
-                    scale = details.scale.clamp(.65, 1.8);
+                    scale = details.scale.clamp(.65, 1.8).toDouble();
                     offset = Offset(
-                      (offset.dx + details.focalPointDelta.dx).clamp(-constraints.maxWidth / 2 + 38, constraints.maxWidth / 2 - 38),
-                      (offset.dy + details.focalPointDelta.dy).clamp(-105, 105),
+                      (offset.dx + details.focalPointDelta.dx).clamp(-constraints.maxWidth / 2 + 38, constraints.maxWidth / 2 - 38).toDouble(),
+                      (offset.dy + details.focalPointDelta.dy).clamp(-105, 105).toDouble(),
                     );
                   }),
                   child: Transform.scale(scale: scale, child: Container(width: 76, height: 76, decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF9B8CFF), Color(0xFF75E0C1)]), borderRadius: BorderRadius.circular(24)), child: const Icon(Icons.open_with, color: Color(0xFF101426)))),
