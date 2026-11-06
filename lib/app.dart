@@ -272,17 +272,17 @@ class _HomeShellState extends State<HomeShell> {
         const ListTile(
           leading: Icon(Icons.phone_android),
           title: Text('Android'),
-          subtitle: Text('Native device information, sensors and app storage.'),
+          subtitle: Text('Device information, sensors, camera, files, haptics and notifications.'),
         ),
         const ListTile(
           leading: Icon(Icons.desktop_windows),
           title: Text('Windows'),
-          subtitle: Text('Adaptive layouts, desktop navigation and window sizing.'),
+          subtitle: Text('Adaptive layouts, desktop navigation, file picking, sharing and window sizing.'),
         ),
         const ListTile(
           leading: Icon(Icons.code),
           title: Text('Built with Flutter'),
-          subtitle: Text('Material 3, Dart, plugins and custom rendering.'),
+          subtitle: Text('Material 3, Dart plugins, audio, storage, networking and custom rendering.'),
         ),
         const SizedBox(height: 12),
         FilledButton.icon(
