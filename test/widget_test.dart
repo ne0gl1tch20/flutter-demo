@@ -25,11 +25,14 @@ void main() {
     expect(find.text('Network Lab'), findsOneWidget);
     expect(find.text('Accessibility Lab'), findsOneWidget);
     expect(find.text('Performance Lab'), findsOneWidget);
+    expect(find.text('Platform Tools'), findsOneWidget);
+    expect(find.text('Audio Lab'), findsOneWidget);
+    expect(find.text('Notifications Lab'), findsOneWidget);
   });
 
   testWidgets('a capability card opens its lab', (tester) async {
-    await tester.view.setPhysicalSize(const Size(1200, 1800));
-    await tester.view.setDevicePixelRatio(1);
+    tester.view.physicalSize = const Size(1200, 1800));
+    tester.view.devicePixelRatio = 1);
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
