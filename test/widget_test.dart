@@ -32,6 +32,9 @@ void main() {
     expect(find.text('App Lifecycle Lab'), findsOneWidget);
     expect(find.text('Keyboard & Shortcuts Lab'), findsOneWidget);
     expect(find.text('Localization & Formatting Lab'), findsOneWidget);
+    expect(find.text('Forms & Validation Lab'), findsOneWidget);
+    expect(find.text('Drag & Drop Lab'), findsOneWidget);
+    expect(find.text('Streams & Async Lab'), findsOneWidget);
   });
 
   testWidgets('a capability card opens its lab', (tester) async {
