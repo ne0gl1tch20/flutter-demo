@@ -313,3 +313,294 @@ class _LocalizationLabState extends State<LocalizationLab> {
     );
   }
 }
+
+
+class FormsLab extends StatefulWidget {
+  const FormsLab({super.key});
+
+  @override
+  State<FormsLab> createState() => _FormsLabState();
+}
+
+class _FormsLabState extends State<FormsLab> {
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  String _result = 'Submit the form to see validated data.';
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    if (!_formKey.currentState!.validate()) {
+      setState(() => _result = 'Fix the highlighted fields and try again.');
+      return;
+    }
+    FocusScope.of(context).unfocus();
+    setState(() => _result =
+        'Welcome, ${_nameController.text.trim()}! Your email passed validation.');
+  }
+
+  @override
+  Widget build(BuildContext context) => AdvancedLabPage(
+        title: 'Forms & Validation Lab',
+        description:
+            'Form, TextFormField, validators, input types, focus handling and inline error states.',
+        child: AdvancedLabPanel(
+          title: 'Validated profile form',
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                TextFormField(
+                  controller: _nameController,
+                  textCapitalization: TextCapitalization.words,
+                  decoration: const InputDecoration(
+                    labelText: 'Display name',
+                    prefixIcon: Icon(Icons.person_outline),
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) => value == null || value.trim().length < 2
+                      ? 'Enter at least two characters.'
+                      : null,
+                ),
+                const SizedBox(height: 14),
+                TextFormField(
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  autofillHints: const [AutofillHints.email],
+                  decoration: const InputDecoration(
+                    labelText: 'Email address',
+                    prefixIcon: Icon(Icons.mail_outline),
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    final email = value?.trim() ?? '';
+                    return RegExp(r'^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$')
+                            .hasMatch(email)
+                        ? null
+                        : 'Enter a valid-looking email address.';
+                  },
+                ),
+                const SizedBox(height: 14),
+                Row(
+                  children: [
+                    Expanded(
+                      child: FilledButton(
+                        onPressed: _submit,
+                        child: const Text('Validate and submit'),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    OutlinedButton(
+                      onPressed: () {
+                        _formKey.currentState?.reset();
+                        _nameController.clear();
+                        _emailController.clear();
+                        setState(() => _result = 'Form reset.');
+                      },
+                      child: const Text('Reset'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(_result),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+}
+
+class DragDropLab extends StatefulWidget {
+  const DragDropLab({super.key});
+
+  @override
+  State<DragDropLab> createState() => _DragDropLabState();
+}
+
+class _DragDropLabState extends State<DragDropLab> {
+  final List<String> _items = ['Widgets', 'Gestures', 'Animations', 'Layouts'];
+  String _dropped = 'Drop a tile into the target area.';
+
+  @override
+  Widget build(BuildContext context) => AdvancedLabPage(
+        title: 'Drag & Drop Lab',
+        description:
+            'Draggable, DragTarget and ReorderableListView support touch and pointer-based interactions.',
+        child: Column(
+          children: [
+            AdvancedLabPanel(
+              title: 'Reorderable list',
+              child: ReorderableListView(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                onReorder: (oldIndex, newIndex) {
+                  setState(() {
+                    if (newIndex > oldIndex) newIndex--;
+                    final item = _items.removeAt(oldIndex);
+                    _items.insert(newIndex, item);
+                  });
+                },
+                children: [
+                  for (final item in _items)
+                    ListTile(
+                      key: ValueKey(item),
+                      leading: const Icon(Icons.drag_handle),
+                      title: Text(item),
+                      tileColor:
+                          Theme.of(context).colorScheme.surfaceContainerHighest,
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            AdvancedLabPanel(
+              title: 'Drag target',
+              child: Column(
+                children: [
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final item in _items)
+                        Draggable<String>(
+                          data: item,
+                          feedback: Material(
+                            color: Colors.transparent,
+                            child: Chip(label: Text(item)),
+                          ),
+                          childWhenDragging: Chip(
+                            label: Text(item),
+                            avatar: const Icon(Icons.more_horiz),
+                          ),
+                          child: Chip(
+                            label: Text(item),
+                            avatar: const Icon(Icons.open_with),
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  DragTarget<String>(
+                    onAcceptWithDetails: (details) =>
+                        setState(() => _dropped = 'Received: ${details.data}'),
+                    builder: (context, candidates, rejected) => Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: candidates.isNotEmpty
+                            ? Theme.of(context).colorScheme.primaryContainer
+                            : Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.outlineVariant,
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          const Icon(Icons.move_to_inbox_outlined, size: 32),
+                          const SizedBox(height: 8),
+                          Text(_dropped),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+}
+
+class StreamsLab extends StatefulWidget {
+  const StreamsLab({super.key});
+
+  @override
+  State<StreamsLab> createState() => _StreamsLabState();
+}
+
+class _StreamsLabState extends State<StreamsLab> {
+  Stream<int>? _ticker;
+
+  void _start() {
+    setState(() {
+      _ticker = Stream<int>.periodic(
+        const Duration(seconds: 1),
+        (tick) => tick + 1,
+      );
+    });
+  }
+
+  void _stop() => setState(() => _ticker = null);
+
+  @override
+  Widget build(BuildContext context) => AdvancedLabPage(
+        title: 'Streams & Async Lab',
+        description:
+            'Streams deliver sequences of asynchronous events. StreamBuilder listens and rebuilds when new values arrive.',
+        child: AdvancedLabPanel(
+          title: 'Live event stream',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              StreamBuilder<int>(
+                stream: _ticker,
+                builder: (context, snapshot) {
+                  final value = snapshot.data;
+                  return Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(22),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          value?.toString() ?? '—',
+                          style: Theme.of(context).textTheme.displayMedium,
+                        ),
+                        Text(
+                          value == null
+                              ? 'Stream is stopped'
+                              : 'Events received: $value',
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                children: [
+                  FilledButton.icon(
+                    onPressed: _ticker == null ? _start : null,
+                    icon: const Icon(Icons.play_arrow),
+                    label: const Text('Start stream'),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: _ticker == null ? null : _stop,
+                    icon: const Icon(Icons.stop),
+                    label: const Text('Stop stream'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+}
