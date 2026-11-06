@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
 
+import 'platform_labs.dart';
+
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -41,6 +43,9 @@ final labCatalog = <LabDefinition>[
   LabDefinition(title: 'Network Lab', description: 'Make an HTTP request and inspect decoded JSON.', category: 'Networking', icon: Icons.wifi_rounded, color: const Color(0xFF7EB8FF), builder: (_) => const NetworkLab()),
   LabDefinition(title: 'Accessibility Lab', description: 'Semantics, scalable text and accessible controls.', category: 'Accessibility', icon: Icons.accessibility_new_rounded, color: const Color(0xFFFFA7C8), builder: (_) => const AccessibilityLab()),
   LabDefinition(title: 'Performance Lab', description: 'Rebuild counters, repaint boundaries and frame budgets.', category: 'Performance', icon: Icons.speed_rounded, color: const Color(0xFFFFD166), builder: (_) => const PerformanceLab()),
+  LabDefinition(title: 'Platform Tools', description: 'Camera, gallery, files, sharing, clipboard and haptics.', category: 'Platform', icon: Icons.phone_android_rounded, color: const Color(0xFF8ED7B2), builder: (_) => const PlatformExtrasLab()),
+  LabDefinition(title: 'Audio Lab', description: 'Play and control audio using a Flutter plugin.', category: 'Media', icon: Icons.graphic_eq_rounded, color: const Color(0xFFFFA875), builder: (_) => const AudioLab()),
+  LabDefinition(title: 'Notifications Lab', description: 'Request permission and send local Android notifications.', category: 'Platform', icon: Icons.notifications_active_rounded, color: const Color(0xFFFFD166), builder: (_) => const NotificationsLab()),
 ];
 
 class LabPage extends StatelessWidget {
