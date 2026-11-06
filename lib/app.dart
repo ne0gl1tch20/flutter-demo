@@ -1,7 +1,14 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'features/labs/labs.dart';
+
+String? get _platformFontFamily => switch (defaultTargetPlatform) {
+      TargetPlatform.android => 'sans-serif',
+      TargetPlatform.windows => 'Segoe UI',
+      _ => null,
+    };
 
 class FlutterLabApp extends StatefulWidget {
   const FlutterLabApp({super.key});
@@ -31,11 +38,13 @@ class _FlutterLabAppState extends State<FlutterLabApp> {
       debugShowCheckedModeBanner: false,
       themeMode: _themeMode,
       theme: ThemeData(
+        fontFamily: _platformFontFamily,
         colorScheme: ColorScheme.fromSeed(seedColor: seed),
         useMaterial3: true,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       darkTheme: ThemeData(
+        fontFamily: _platformFontFamily,
         colorScheme: ColorScheme.fromSeed(
           seedColor: seed,
           brightness: Brightness.dark,
@@ -272,17 +281,23 @@ class _HomeShellState extends State<HomeShell> {
         const ListTile(
           leading: Icon(Icons.phone_android),
           title: Text('Android'),
-          subtitle: Text('Device information, sensors, camera, files, haptics and notifications.'),
+          subtitle: Text(
+            'Device information, sensors, camera, files, haptics and notifications.',
+          ),
         ),
         const ListTile(
           leading: Icon(Icons.desktop_windows),
           title: Text('Windows'),
-          subtitle: Text('Adaptive layouts, desktop navigation, file picking, sharing and window sizing.'),
+          subtitle: Text(
+            'Adaptive layouts, desktop navigation, file picking, sharing and window sizing.',
+          ),
         ),
         const ListTile(
           leading: Icon(Icons.code),
           title: Text('Built with Flutter'),
-          subtitle: Text('Material 3, Dart plugins, audio, storage, networking and custom rendering.'),
+          subtitle: Text(
+            'Material 3, Dart plugins, audio, storage, networking and custom rendering.',
+          ),
         ),
         const SizedBox(height: 12),
         FilledButton.icon(
