@@ -380,8 +380,9 @@ class _FormsLabState extends State<FormsLab> {
                   ),
                   validator: (value) {
                     final email = value?.trim() ?? '';
-                    return RegExp(r'^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$')
-                            .hasMatch(email)
+                    return email.contains('@') &&
+                            email.split('@').last.contains('.') &&
+                            !email.contains(' ')
                         ? null
                         : 'Enter a valid-looking email address.';
                   },
