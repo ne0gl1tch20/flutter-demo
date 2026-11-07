@@ -341,20 +341,10 @@ class RunnerGame extends FlameGame with HasCollisionDetection {
       'flame/coin.png',
       'flame/slime.png',
       'flame/ground.png',
-      'flame/background.png',
     ]);
 
     final sky = _Sky();
     world.add(sky);
-
-    final background = SpriteComponent(
-      sprite: Sprite(images.fromCache('flame/background.png')),
-      position: Vector2(0, 0),
-      size: Vector2(levelEnd, 450),
-      anchor: Anchor.topLeft,
-      priority: -5,
-    );
-    world.add(background);
 
     for (var x = 0.0; x < levelEnd; x += 70) {
       world.add(SpriteComponent(
