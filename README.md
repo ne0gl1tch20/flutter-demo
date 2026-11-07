@@ -27,6 +27,10 @@ An interactive playground for exploring Flutter capabilities on Android and Wind
 - **Drag & Drop Lab** — draggable widgets, drop targets and reorderable lists.
 - **Streams & Async Lab** — asynchronous event streams and StreamBuilder.
 
+## Flame game lab
+
+The **Flame Game Lab** is a playable side-scrolling platformer built with the Flame engine. It includes a fixed-resolution game camera, player movement and jumping, platform landing, coin collection, patrolling enemies, health, pause/restart states and mobile touch controls plus keyboard input on desktop. Kenney Platformer Art Deluxe sprites are included under `assets/images/flame/` (CC0).
+
 ## Platforms
 
 The project targets Android and Windows. Platform projects are generated in CI from the Flutter SDK so the repository stays focused on the shared Dart application.
