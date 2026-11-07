@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:file_picker/file_picker.dart';
@@ -119,8 +118,7 @@ class _VisualBuilderLabState extends State<VisualBuilderLab> {
         : ReorderableListView(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            onReorder: (oldIndex, newIndex) => setState(() {
-              if (newIndex > oldIndex) newIndex--;
+            onReorderItem: (oldIndex, newIndex) => setState(() {
               final item = nodes.removeAt(oldIndex);
               nodes.insert(newIndex, item);
             }),
