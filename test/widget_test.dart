@@ -204,8 +204,8 @@ void main() {
   });
 
   testWidgets('widget studio exposes live component controls', (tester) async {
-    await tester.view.setPhysicalSize(const Size(900, 1600));
-    await tester.view.setDevicePixelRatio(1);
+    tester.view.physicalSize = const Size(900, 1600));
+    tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
@@ -219,7 +219,7 @@ void main() {
 
   testWidgets('visual UI builder can add and remove components', (tester) async {
     tester.view.physicalSize = const Size(900, 1800);
-    await tester.view.setDevicePixelRatio(1);
+    tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
