@@ -56,7 +56,7 @@ class _DrawingPainter extends CustomPainter {
     }
   }
   @override
-  bool shouldRepaint(covariant _DrawingPainter old) => !identical(old.strokes, strokes) || old.strokes.length != strokes.length;
+  bool shouldRepaint(covariant _DrawingPainter old) => true;
 }
 
 enum _ChartKind { bars, line, pie }
