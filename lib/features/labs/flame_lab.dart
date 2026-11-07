@@ -628,12 +628,12 @@ class _Slime extends SpriteComponent with HasGameReference<RunnerGame> {
 
 class _Sky extends PositionComponent {
   _Sky() {
-    size = Vector2(2900, 450);
+    // Paint beyond the playable world so the camera never exposes black gutters.\n    size = Vector2(20000, 3000);
   }
 
   @override
   void render(Canvas canvas) {
-    final rect = Rect.fromLTWH(0, 0, RunnerGame.levelEnd, 450);
+    final rect = Rect.fromLTWH(-10000, -2000, 20000, 3000);
     canvas.drawRect(rect, Paint()..shader = const LinearGradient(
       colors: [Color(0xFF72C8F5), Color(0xFFB9E7F8), Color(0xFFE5F5D7)],
       begin: Alignment.topCenter,
