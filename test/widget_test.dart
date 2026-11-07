@@ -4,7 +4,65 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_lab/app.dart';
 
 void main() {
-  setUp(() => SharedPreferences.setMockInitialValues({}));
+  setUp(() => SharedPreferences.setMockInitialValues({'onboarding.complete': true}));
+
+  testWidgets('first launch shows onboarding and remembers completion', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(900, 1500);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const FlutterLabApp());
+    await tester.pumpAndSettle();
+    expect(find.text('Explore Flutter'), findsOneWidget);
+    await tester.tap(find.text('Continue'));
+    await tester.pumpAndSettle();
+    expect(find.text('Make it yours'), findsOneWidget);
+    await tester.tap(find.text('Continue'));
+    await tester.pumpAndSettle();
+    expect(find.text('Experiment freely'), findsOneWidget);
+    await tester.tap(find.text('Get started'));
+    await tester.pumpAndSettle();
+    expect(find.text('Build. Explore. Experiment.'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('returning users wait for saved preferences before showing the home screen', (tester) async {
+    SharedPreferences.setMockInitialValues({
+      'onboarding.complete': true,
+      'settings.theme': 2,
+    });
+    tester.view.physicalSize = const Size(900, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const FlutterLabApp());
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Build. Explore. Experiment.'), findsOneWidget);
+    expect(find.text('Explore Flutter'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('dashboard order editor opens and saves custom order', (tester) async {
+    tester.view.physicalSize = const Size(1200, 2400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const FlutterLabApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Reorder'));
+    await tester.pumpAndSettle();
+    expect(find.text('Reorder dashboard'), findsOneWidget);
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+    expect(find.text('Build. Explore. Experiment.'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('home screen exposes the Flutter capability catalog', (tester) async {
     tester.view.physicalSize = const Size(1200, 3000);
@@ -31,6 +89,7 @@ void main() {
     expect(find.text('Performance Lab'), findsOneWidget);
     expect(find.text('Platform Tools'), findsOneWidget);
     expect(find.text('Audio Lab 2.0'), findsOneWidget);
+    expect(find.text('Download Queue'), findsOneWidget);
     expect(find.text('Notifications Lab'), findsOneWidget);
     expect(find.text('Concurrency Lab'), findsOneWidget);
     expect(find.text('App Lifecycle Lab'), findsOneWidget);
@@ -58,6 +117,49 @@ void main() {
 
     expect(find.text('Button styles'), findsOneWidget);
     expect(find.text('Live controls'), findsOneWidget);
+  });
+
+  testWidgets('download queue accepts a sample and validates URLs', (tester) async {
+    tester.view.physicalSize = const Size(1000, 2200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const FlutterLabApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Download Queue'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Your download queue is empty. Add a URL to get started.'), findsOneWidget);
+    await tester.tap(find.text('Add sample'));
+    await tester.pumpAndSettle();
+    expect(find.text('1 queued item(s)'), findsOneWidget);
+    expect(find.text('Queued'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('locale lab safely switches date and currency formatting', (tester) async {
+    tester.view.physicalSize = const Size(1200, 2400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const FlutterLabApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Localization & Formatting Lab'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Welcome to Flutter Lab'), findsOneWidget);
+    await tester.tap(find.text('Filipino'));
+    await tester.pumpAndSettle();
+    expect(find.text('Maligayang pagdating sa Flutter Lab'), findsOneWidget);
+    expect(find.textContaining('Locale: fil_PH'), findsOneWidget);
+
+    await tester.tap(find.text('Español'));
+    await tester.pumpAndSettle();
+    expect(find.text('Te damos la bienvenida a Flutter Lab'), findsOneWidget);
+    expect(find.textContaining('Locale: es_ES'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('settings screen exposes appearance and behavior controls', (tester) async {

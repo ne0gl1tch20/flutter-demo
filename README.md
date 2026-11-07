@@ -21,6 +21,7 @@ An interactive playground for exploring Flutter capabilities on Android and Wind
 - **Performance Lab** — rebuild counters, RepaintBoundary and custom-painted particles.
 - **Platform Tools** — camera/gallery capture, file picking, sharing, clipboard and haptics.
 - **Audio Lab 2.0** — streamed download progress, waveform-style playback visualization, playback speed and looping.
+- **Download Queue** — add HTTP(S) files, process sequentially and monitor progress, completion and retry states.
 - **Notifications Lab** — Android notification permission and local notifications.
 - **Concurrency Lab** — CPU-heavy prime counting on a background Dart isolate.
 - **App Lifecycle Lab** — observe pause, resume and other lifecycle transitions.
@@ -31,6 +32,9 @@ An interactive playground for exploring Flutter capabilities on Android and Wind
 - **Streams & Async Lab** — asynchronous event streams and StreamBuilder.
 
 ## App settings and quality of life
+
+- First-run onboarding introduces the main labs and personalization controls.
+- Reorder the capability dashboard and keep your preferred layout between launches.
 
 - Persistent system/light/dark theme, accent color and text scaling.
 - Animation and haptic feedback toggles.
