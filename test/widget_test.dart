@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_lab/app.dart';
 
 void main() {
-  setUp(() => SharedPreferences.setMockInitialValues({});
+  setUp(() => SharedPreferences.setMockInitialValues({}));
   testWidgets('home screen exposes the Flutter capability catalog', (tester) async {
     tester.view.physicalSize = const Size(1200, 3000);
     tester.view.devicePixelRatio = 1;
