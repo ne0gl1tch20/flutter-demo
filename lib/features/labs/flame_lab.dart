@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
@@ -492,7 +493,7 @@ class RunnerGame extends FlameGame with HasCollisionDetection {
     final ar = Rect.fromLTWH(a.x + inset, a.y + inset,
         math.max(0.0, a.width - inset * 2).toDouble(), math.max(0.0, a.height - inset * 2).toDouble());
     final br = Rect.fromLTWH(b.x + inset, b.y + inset,
-        math.max(0, b.width - inset * 2), math.max(0, b.height - inset * 2));
+        math.max(0.0, b.width - inset * 2).toDouble(), math.max(0.0, b.height - inset * 2).toDouble());
     return ar.overlaps(br);
   }
 
