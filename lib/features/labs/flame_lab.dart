@@ -26,13 +26,13 @@ class _FlamePlatformerLabState extends State<FlamePlatformerLab> {
   @override
   void dispose() {
     _game.pauseEngine();
-    _game.dispose();
+    _game.disposeNotifiers();
     super.dispose();
   }
 
   void _restart() {
     _game.pauseEngine();
-    _game.dispose();
+    _game.disposeNotifiers();
     setState(() => _game = RunnerGame()..start());
   }
 
@@ -303,12 +303,14 @@ class _ControlButton extends StatelessWidget {
 }
 
 class RunnerGame extends FlameGame with HasCollisionDetection {
-  RunnerGame() : super(
-    world: World(),
+  RunnerGame() : this._(World());
+
+  RunnerGame._(World gameWorld) : super(
+    world: gameWorld,
     camera: CameraComponent.withFixedResolution(
       width: 800,
       height: 450,
-      world: World(),
+      world: gameWorld,
     ),
   );
 
@@ -319,6 +321,7 @@ class RunnerGame extends FlameGame with HasCollisionDetection {
   late final _RunnerPlayer player;
   final List<_Coin> _coins = [];
   final List<_Slime> _slimes = [];
+  final List<Rect> _platforms = [];
   double direction = 0;
   double _damageCooldown = 0;
   bool _loaded = false;
@@ -363,22 +366,25 @@ class RunnerGame extends FlameGame with HasCollisionDetection {
       ));
     }
 
-    for (final platform in <Vector3>[
-      Vector3(430, 305, 4),
-      Vector3(760, 265, 3),
-      Vector3(1110, 315, 4),
-      Vector3(1500, 275, 4),
-      Vector3(1910, 300, 4),
-      Vector3(2280, 255, 5),
-    ]) {
-      for (var i = 0; i < platform.z; i++) {
+    const platforms = [
+      (430.0, 305.0, 4),
+      (760.0, 265.0, 3),
+      (1110.0, 315.0, 4),
+      (1500.0, 275.0, 4),
+      (1910.0, 300.0, 4),
+      (2280.0, 255.0, 5),
+    ];
+    for (final platform in platforms) {
+      for (var i = 0; i < platform.$3; i++) {
+        final x = platform.$1 + i * 56;
         world.add(SpriteComponent(
           sprite: Sprite(images.fromCache('flame/ground.png')),
-          position: Vector2(platform.x + i * 56, platform.y),
+          position: Vector2(x, platform.$2),
           size: Vector2(56, 42),
           anchor: Anchor.topLeft,
           priority: 1,
         ));
+        _platforms.add(Rect.fromLTWH(x, platform.$2, 56, 20));
       }
     }
 
@@ -386,6 +392,7 @@ class RunnerGame extends FlameGame with HasCollisionDetection {
       ..position = Vector2(100, groundY - 76)
       ..size = Vector2(52, 76);
     world.add(player);
+    camera.follow(player, horizontalOnly: true);
 
     for (final point in <Vector2>[
       Vector2(270, 320), Vector2(470, 245), Vector2(540, 245),
@@ -394,7 +401,7 @@ class RunnerGame extends FlameGame with HasCollisionDetection {
       Vector2(1970, 240), Vector2(2040, 240), Vector2(2350, 195),
       Vector2(2430, 195), Vector2(2630, 320),
     ]) {
-      final coin = _Coin(this)
+      final coin = _Coin()
         ..position = point
         ..size = Vector2.all(30);
       _coins.add(coin);
@@ -498,12 +505,10 @@ class RunnerGame extends FlameGame with HasCollisionDetection {
     return ar.overlaps(br);
   }
 
-  @override
-  void onRemove() {
+  void disposeNotifiers() {
     score.dispose();
     health.dispose();
     status.dispose();
-    super.onRemove();
   }
 }
 
@@ -513,6 +518,7 @@ class _RunnerPlayer extends SpriteComponent with HasGameReference<RunnerGame> {
   double velocityY = 0;
   bool onGround = false;
   double _walkClock = 0;
+  bool _facingLeft = false;
 
   @override
   void onMount() {
@@ -530,10 +536,24 @@ class _RunnerPlayer extends SpriteComponent with HasGameReference<RunnerGame> {
     final previousBottom = y + height;
     y += velocityY * dt;
 
-    if (previousBottom <= RunnerGame.groundY &&
-        y + height >= RunnerGame.groundY &&
-        velocityY >= 0) {
+    var landed = false;
+    if (velocityY >= 0 && previousBottom <= RunnerGame.groundY &&
+        y + height >= RunnerGame.groundY) {
       y = RunnerGame.groundY - height;
+      landed = true;
+    } else if (velocityY >= 0) {
+      for (final platform in owner._platforms) {
+        if (previousBottom <= platform.top &&
+            y + height >= platform.top &&
+            x + width > platform.left &&
+            x < platform.right) {
+          y = platform.top - height;
+          landed = true;
+          break;
+        }
+      }
+    }
+    if (landed) {
       velocityY = 0;
       onGround = true;
     } else {
@@ -542,7 +562,7 @@ class _RunnerPlayer extends SpriteComponent with HasGameReference<RunnerGame> {
 
     _walkClock += dt;
     if (!onGround) {
-      sprite = game.images.fromCache('flame/player_jump.png').let(Sprite.new);
+      sprite = Sprite(game.images.fromCache('flame/player_jump.png'));
     } else if (owner.direction != 0) {
       final frame = (_walkClock * 9).floor().isEven
           ? 'flame/player_walk_1.png'
@@ -551,17 +571,15 @@ class _RunnerPlayer extends SpriteComponent with HasGameReference<RunnerGame> {
     } else {
       sprite = Sprite(game.images.fromCache('flame/player.png'));
     }
-    if (owner.direction < 0) {
-      flipHorizontally();
-    } else if (owner.direction > 0) {
-      flipHorizontally(false);
+    if (owner.direction != 0 && (owner.direction < 0) != _facingLeft) {
+      _facingLeft = owner.direction < 0;
+      flipHorizontally(_facingLeft);
     }
   }
 }
 
 class _Coin extends SpriteComponent with HasGameReference<RunnerGame> {
-  _Coin(this.owner) : super(anchor: Anchor.topLeft, priority: 4);
-  final RunnerGame owner;
+  _Coin() : super(anchor: Anchor.topLeft, priority: 4);
   bool collected = false;
   double _time = 0;
 
