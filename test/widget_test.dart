@@ -4,7 +4,46 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_lab/app.dart';
 
 void main() {
-  setUp(() => SharedPreferences.setMockInitialValues({}));
+  setUp(() => SharedPreferences.setMockInitialValues({'onboarding.complete': true}));
+
+  testWidgets('first launch shows onboarding and remembers completion', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(900, 1500);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const FlutterLabApp());
+    await tester.pumpAndSettle();
+    expect(find.text('Explore Flutter'), findsOneWidget);
+    await tester.tap(find.text('Continue'));
+    await tester.pumpAndSettle();
+    expect(find.text('Make it yours'), findsOneWidget);
+    await tester.tap(find.text('Continue'));
+    await tester.pumpAndSettle();
+    expect(find.text('Experiment freely'), findsOneWidget);
+    await tester.tap(find.text('Get started'));
+    await tester.pumpAndSettle();
+    expect(find.text('Build. Explore. Experiment.'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('dashboard order editor opens and saves custom order', (tester) async {
+    tester.view.physicalSize = const Size(1200, 2400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const FlutterLabApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Reorder'));
+    await tester.pumpAndSettle();
+    expect(find.text('Reorder dashboard'), findsOneWidget);
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+    expect(find.text('Build. Explore. Experiment.'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('home screen exposes the Flutter capability catalog', (tester) async {
     tester.view.physicalSize = const Size(1200, 3000);
