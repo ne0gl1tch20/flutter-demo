@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_lab/app.dart';
 
 void main() {
+  setUp(() => SharedPreferences.setMockInitialValues({});
   testWidgets('home screen exposes the Flutter capability catalog', (tester) async {
-    tester.view.physicalSize = const Size(1200, 1800);
+    tester.view.physicalSize = const Size(1200, 3000);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
@@ -35,7 +37,7 @@ void main() {
     expect(find.text('Forms & Validation Lab'), findsOneWidget);
     expect(find.text('Drag & Drop Lab'), findsOneWidget);
     expect(find.text('Streams & Async Lab'), findsOneWidget);
-    expect(find.text('Flame Game Lab'), findsOneWidget);
+    expect(find.text('Canvas Lab'), findsOneWidget);\n    expect(find.text('Charts Lab'), findsOneWidget);\n    expect(find.text('Developer Tools'), findsOneWidget);\n    expect(find.text('Flame Game Lab'), findsOneWidget);
   });
 
   testWidgets('a capability card opens its lab', (tester) async {
@@ -52,3 +54,21 @@ void main() {
     expect(find.text('Live controls'), findsOneWidget);
   });
 }
+
+  testWidgets('settings screen exposes persistent appearance and behavior controls', (tester) async {
+    tester.view.physicalSize = const Size(800, 1400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const FlutterLabApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Settings'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Settings'), findsOneWidget);
+    expect(find.text('Appearance'), findsOneWidget);
+    expect(find.text('Accent color'), findsOneWidget);
+    expect(find.text('Text size'), findsOneWidget);
+    expect(find.text('Haptic feedback'), findsOneWidget);
+  });
