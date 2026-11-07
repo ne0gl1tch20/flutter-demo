@@ -333,7 +333,9 @@ class _AudioLabState extends State<AudioLab> {
         _status = 'Download complete. Starting playback…';
       });
 
-      await _player.setReleaseMode(_loop ? ReleaseMode.loop : ReleaseMode.release);\n      await _player.setPlaybackRate(_playbackRate);\n      await _player.play(DeviceFileSource(sampleFile.path));
+      await _player.setReleaseMode(_loop ? ReleaseMode.loop : ReleaseMode.release);
+      await _player.setPlaybackRate(_playbackRate);
+      await _player.play(DeviceFileSource(sampleFile.path));
       if (mounted) {
         setState(() {
           _playing = true;
