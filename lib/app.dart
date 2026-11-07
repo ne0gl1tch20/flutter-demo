@@ -443,7 +443,6 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final page = _pages[_page];
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -537,8 +536,7 @@ class _LabOrderPageState extends State<LabOrderPage> {
     body: ReorderableListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: _labs.length,
-      onReorder: (oldIndex, newIndex) => setState(() {
-        if (newIndex > oldIndex) newIndex--;
+      onReorderItem: (oldIndex, newIndex) => setState(() {
         final item = _labs.removeAt(oldIndex);
         _labs.insert(newIndex, item);
       }),
