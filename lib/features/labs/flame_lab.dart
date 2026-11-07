@@ -452,7 +452,7 @@ class RunnerGame extends FlameGame with HasCollisionDetection {
     _damageCooldown = 1.15;
     health.value = math.max(0, health.value - 1);
     player.velocityY = -260;
-    player.position.x = math.max(0, player.position.x - 38);
+    player.position.x = math.max(0.0, player.position.x - 38).toDouble();
     if (health.value == 0) {
       status.value = RunnerStatus.gameOver;
       pauseEngine();
@@ -463,7 +463,7 @@ class RunnerGame extends FlameGame with HasCollisionDetection {
   void update(double dt) {
     super.update(dt);
     if (status.value != RunnerStatus.playing) return;
-    _damageCooldown = math.max(0, _damageCooldown - dt);
+    _damageCooldown = math.max(0.0, _damageCooldown - dt);
 
     for (final coin in _coins) {
       if (!coin.collected && _overlaps(player, coin, inset: 9)) {
@@ -478,7 +478,7 @@ class RunnerGame extends FlameGame with HasCollisionDetection {
     if (player.position.y > 520) {
       hitPlayer();
       player.position
-        ..x = math.max(0, player.position.x - 100)
+        ..x = math.max(0.0, player.position.x - 100).toDouble()
         ..y = groundY - player.height;
       player.velocityY = 0;
     }
@@ -490,7 +490,7 @@ class RunnerGame extends FlameGame with HasCollisionDetection {
 
   bool _overlaps(PositionComponent a, PositionComponent b, {double inset = 0}) {
     final ar = Rect.fromLTWH(a.x + inset, a.y + inset,
-        math.max(0, a.width - inset * 2), math.max(0, a.height - inset * 2));
+        math.max(0.0, a.width - inset * 2).toDouble(), math.max(0.0, a.height - inset * 2).toDouble());
     final br = Rect.fromLTWH(b.x + inset, b.y + inset,
         math.max(0, b.width - inset * 2), math.max(0, b.height - inset * 2));
     return ar.overlaps(br);
@@ -522,7 +522,7 @@ class _RunnerPlayer extends SpriteComponent with HasGameReference<RunnerGame> {
     super.update(dt);
     if (owner.status.value != RunnerStatus.playing) return;
 
-    x = (x + owner.direction * 245 * dt).clamp(0, RunnerGame.levelEnd - width);
+    x = (x + owner.direction * 245 * dt).clamp(0.0, RunnerGame.levelEnd - width).toDouble();
     velocityY += 1150 * dt;
     final previousBottom = y + height;
     y += velocityY * dt;
