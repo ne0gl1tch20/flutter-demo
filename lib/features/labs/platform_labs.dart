@@ -449,6 +449,216 @@ class _AudioLabState extends State<AudioLab> {
       );
 }
 
+class _DownloadQueueItem {
+  _DownloadQueueItem(this.url, this.id);
+  final String url;
+  final int id;
+  String status = 'Queued';
+  int downloaded = 0;
+  int total = 0;
+  String? error;
+}
+
+class DownloadQueueLab extends StatefulWidget {
+  const DownloadQueueLab({super.key});
+
+  @override
+  State<DownloadQueueLab> createState() => _DownloadQueueLabState();
+}
+
+class _DownloadQueueLabState extends State<DownloadQueueLab> {
+  final _urlController = TextEditingController();
+  final List<_DownloadQueueItem> _items = [];
+  bool _running = false;
+  int _nextId = 0;
+
+  @override
+  void dispose() {
+    _urlController.dispose();
+    super.dispose();
+  }
+
+  void _addUrl() {
+    final raw = _urlController.text.trim();
+    final uri = Uri.tryParse(raw);
+    if (uri == null || !uri.hasAuthority || !['http', 'https'].contains(uri.scheme)) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Enter a valid HTTP or HTTPS URL.')));
+      return;
+    }
+    setState(() {
+      _items.add(_DownloadQueueItem(uri.toString(), _nextId++));
+      _urlController.clear();
+    });
+  }
+
+  void _addSample() {
+    _urlController.text = 'https://actions.google.com/sounds/v1/cartoon/pop.ogg';
+    _addUrl();
+  }
+
+  Future<void> _startQueue() async {
+    if (_running) return;
+    setState(() => _running = true);
+    try {
+      while (mounted) {
+        final index = _items.indexWhere((item) => item.status == 'Queued');
+        if (index < 0) break;
+        await _download(_items[index]);
+      }
+    } finally {
+      if (mounted) setState(() => _running = false);
+    }
+  }
+
+  Future<void> _download(_DownloadQueueItem item) async {
+    HttpClient? client;
+    IOSink? sink;
+    try {
+      setState(() {
+        item.status = 'Downloading';
+        item.downloaded = 0;
+        item.total = 0;
+        item.error = null;
+      });
+      final uri = Uri.parse(item.url);
+      client = HttpClient()..connectionTimeout = const Duration(seconds: 20);
+      final request = await client.getUrl(uri).timeout(const Duration(seconds: 30));
+      final response = await request.close().timeout(const Duration(seconds: 60));
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        throw HttpException('Server returned HTTP ${response.statusCode}.');
+      }
+      item.total = response.contentLength > 0 ? response.contentLength : 0;
+      final directory = await getTemporaryDirectory();
+      final downloadDirectory = Directory('${directory.path}/flutter_lab_downloads');
+      await downloadDirectory.create(recursive: true);
+      final rawName = uri.pathSegments.isEmpty ? 'download_${item.id}' : Uri.decodeComponent(uri.pathSegments.last);
+      final safeName = rawName.replaceAll(RegExp(r'[^A-Za-z0-9._-]'), '_');
+      final file = File('${downloadDirectory.path}/${item.id}_$safeName');
+      sink = file.openWrite();
+      await for (final chunk in response) {
+        sink.add(chunk);
+        item.downloaded += chunk.length;
+        if (mounted) setState(() {});
+      }
+      await sink.flush();
+      await sink.close();
+      sink = null;
+      if (mounted) setState(() => item.status = 'Completed');
+    } catch (error) {
+      await sink?.close();
+      if (mounted) {
+        setState(() {
+          item.status = 'Failed';
+          item.error = error.toString();
+        });
+      }
+    } finally {
+      client?.close(force: true);
+    }
+  }
+
+  void _remove(_DownloadQueueItem item) {
+    if (_running && item.status == 'Downloading') return;
+    setState(() => _items.removeWhere((entry) => entry.id == item.id));
+  }
+
+  void _retry(_DownloadQueueItem item) {
+    setState(() {
+      item.status = 'Queued';
+      item.error = null;
+      item.downloaded = 0;
+      item.total = 0;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => PlatformLabPage(
+    title: 'Download Queue',
+    description: 'Add HTTP or HTTPS files, process downloads one at a time and track each transfer. Files are saved in the app temporary directory.',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        PlatformLabCardPanel(
+          title: 'Add a download',
+          child: Column(
+            children: [
+              TextField(
+                controller: _urlController,
+                keyboardType: TextInputType.url,
+                decoration: const InputDecoration(
+                  labelText: 'File URL',
+                  hintText: 'https://example.com/file.zip',
+                  prefixIcon: Icon(Icons.link_rounded),
+                  border: OutlineInputBorder(),
+                ),
+                onSubmitted: (_) => _addUrl(),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(child: OutlinedButton.icon(onPressed: _addSample, icon: const Icon(Icons.music_note_rounded), label: const Text('Add sample'))),
+                  const SizedBox(width: 10),
+                  Expanded(child: FilledButton.icon(onPressed: _addUrl, icon: const Icon(Icons.add_rounded), label: const Text('Add URL'))),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+        Row(
+          children: [
+            Expanded(child: Text('${_items.length} queued item(s)', style: Theme.of(context).textTheme.titleMedium)),
+            FilledButton.icon(
+              onPressed: _running || !_items.any((item) => item.status == 'Queued') ? null : _startQueue,
+              icon: Icon(_running ? Icons.downloading_rounded : Icons.play_arrow_rounded),
+              label: Text(_running ? 'Downloading' : 'Start queue'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        if (_items.isEmpty)
+          const Card(child: Padding(padding: EdgeInsets.all(20), child: Center(child: Text('Your download queue is empty. Add a URL to get started.'))))
+        else
+          ..._items.map((item) => Card(
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(item.status == 'Completed' ? Icons.check_circle_rounded : item.status == 'Failed' ? Icons.error_outline_rounded : Icons.insert_drive_file_outlined),
+                      const SizedBox(width: 8),
+                      Expanded(child: Text(item.url, maxLines: 2, overflow: TextOverflow.ellipsis)),
+                      if (item.status == 'Failed')
+                        IconButton(tooltip: 'Retry download', onPressed: _running ? null : () => _retry(item), icon: const Icon(Icons.refresh_rounded)),
+                      IconButton(tooltip: 'Remove download', onPressed: _running && item.status == 'Downloading' ? null : () => _remove(item), icon: const Icon(Icons.close_rounded)),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Expanded(child: Text(item.status, style: Theme.of(context).textTheme.labelMedium)),
+                      Text(item.total > 0 ? '${(item.downloaded / item.total * 100).clamp(0, 100).round()}%' : '${item.downloaded} bytes', style: Theme.of(context).textTheme.labelMedium),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  LinearProgressIndicator(
+                    value: item.status == 'Completed' ? 1 : item.total > 0 ? (item.downloaded / item.total).clamp(0, 1) : null,
+                  ),
+                  if (item.error != null) ...[
+                    const SizedBox(height: 6),
+                    Text(item.error!, style: TextStyle(color: Theme.of(context).colorScheme.error), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  ],
+                ],
+              ),
+            ),
+          )),
+      ],
+    ),
+  );
+}
+
 class NotificationsLab extends StatefulWidget {
   const NotificationsLab({super.key});
 
