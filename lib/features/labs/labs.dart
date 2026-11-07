@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:math' as math;
 
 import 'advanced_labs.dart';
+import 'extra_labs.dart';
 import 'flame_lab.dart';
 import 'platform_labs.dart';
 
@@ -55,6 +56,9 @@ final labCatalog = <LabDefinition>[
   LabDefinition(title: 'Forms & Validation Lab', description: 'Build forms with input types, validation and focus handling.', category: 'Input', icon: Icons.assignment_rounded, color: const Color(0xFF9B8CFF), builder: (_) => const FormsLab()),
   LabDefinition(title: 'Drag & Drop Lab', description: 'Reorder lists and move draggable widgets into drop targets.', category: 'Interaction', icon: Icons.open_with_rounded, color: const Color(0xFF75E0C1), builder: (_) => const DragDropLab()),
   LabDefinition(title: 'Streams & Async Lab', description: 'Receive asynchronous events and render them with StreamBuilder.', category: 'State', icon: Icons.stream_rounded, color: const Color(0xFF7EB8FF), builder: (_) => const StreamsLab()),
+  LabDefinition(title: 'Canvas Lab', description: 'Draw with custom canvas, brush colors, undo and redo.', category: 'Graphics', icon: Icons.draw_rounded, color: const Color(0xFFFF82AD), builder: (_) => const CanvasLab()),
+  LabDefinition(title: 'Charts Lab', description: 'Interactive bar, line and pie charts with live values.', category: 'Data', icon: Icons.insert_chart_rounded, color: const Color(0xFF73B7FF), builder: (_) => const ChartsLab()),
+  LabDefinition(title: 'Developer Tools', description: 'Runtime information, diagnostic console and copyable logs.', category: 'Developer', icon: Icons.terminal_rounded, color: const Color(0xFFB9A1FF), builder: (_) => const DeveloperToolsLab()),
   LabDefinition(title: 'Flame Game Lab', description: 'A complete 2D platformer with physics, camera, collisions, enemies and touch controls.', category: 'Game Development', icon: Icons.sports_esports_rounded, color: const Color(0xFFFFD166), builder: (_) => const FlamePlatformerLab()),
 ];
 
