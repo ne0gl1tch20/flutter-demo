@@ -63,8 +63,10 @@ jobs:
               path.write_text(content)
           PY
           grep -R "compileSdk" android/app/build.gradle*
-      - name: Declare Android notification permission
-        run: sed -i '/<manifest/a\    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>' android/app/src/main/AndroidManifest.xml
+      - name: Declare Android network and notification permissions
+        run: |
+          sed -i '/<manifest/a\    <uses-permission android:name="android.permission.INTERNET"/>' android/app/src/main/AndroidManifest.xml
+          sed -i '/<manifest/a\    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>' android/app/src/main/AndroidManifest.xml
       - name: Set Android app label
         run: sed -i 's/android:label="flutterlab"/android:label="Flutter Lab"/' android/app/src/main/AndroidManifest.xml
       - name: Enable Android core library desugaring
@@ -85,8 +87,8 @@ jobs:
 
   windows:
     name: Windows desktop release
-    needs: validate
     runs-on: windows-latest
+    needs: validate
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
