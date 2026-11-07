@@ -29,6 +29,7 @@ class _FlutterLabAppState extends State<FlutterLabApp> {
   double _textScale = 1;
   bool _animations = true;
   bool _haptics = true;
+  bool _onboardingComplete = false;
 
   @override
   void initState() {
@@ -45,7 +46,14 @@ class _FlutterLabAppState extends State<FlutterLabApp> {
       _textScale = (prefs.getDouble('settings.textScale') ?? 1).clamp(.85, 1.3).toDouble();
       _animations = prefs.getBool('settings.animations') ?? true;
       _haptics = prefs.getBool('settings.haptics') ?? true;
+      _onboardingComplete = prefs.getBool('onboarding.complete') ?? false;
     });
+  }
+
+  Future<void> _completeOnboarding() async {
+    await _save('onboarding.complete', true);
+    if (!mounted) return;
+    setState(() => _onboardingComplete = true);
   }
 
   Future<void> _save(String key, Object value) async {
@@ -139,7 +147,8 @@ class _FlutterLabAppState extends State<FlutterLabApp> {
         data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(_textScale)),
         child: child ?? const SizedBox.shrink(),
       ),
-      home: HomeShell(
+      home: _onboardingComplete
+          ? HomeShell(
         themeMode: _themeMode,
         animationsEnabled: _animations,
         hapticsEnabled: _haptics,
@@ -149,7 +158,8 @@ class _FlutterLabAppState extends State<FlutterLabApp> {
           ThemeMode.light => ThemeMode.system,
         }),
         onSettingsPressed: _openSettings,
-      ),
+      )
+          : OnboardingPage(onComplete: _completeOnboarding),
     );
   }
 }
@@ -253,6 +263,7 @@ class _HomeShellState extends State<HomeShell> {
   bool _favoritesOnly = false;
   Set<String> _favorites = {};
   List<String> _recent = [];
+  List<String> _order = [];
 
   @override
   void initState() { super.initState(); _loadLibrary(); }
@@ -263,6 +274,7 @@ class _HomeShellState extends State<HomeShell> {
     setState(() {
       _favorites = (prefs.getStringList('library.favorites') ?? []).toSet();
       _recent = prefs.getStringList('library.recent') ?? [];
+      _order = prefs.getStringList('library.order') ?? [];
     });
   }
 
@@ -282,6 +294,28 @@ class _HomeShellState extends State<HomeShell> {
     });
     final prefs = await SharedPreferences.getInstance();
     await prefs.setStringList('library.recent', _recent);
+  }
+
+  Future<void> _openReorder() async {
+    final result = await Navigator.of(context).push<List<String>>(MaterialPageRoute(
+      builder: (_) => LabOrderPage(labs: _orderedCatalog(), initialOrder: _order),
+    ));
+    if (result == null || !mounted) return;
+    setState(() => _order = result);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('library.order', _order);
+  }
+
+  List<LabDefinition> _orderedCatalog() {
+    final items = [...labCatalog];
+    items.sort((a, b) {
+      final ai = _order.indexOf(a.title);
+      final bi = _order.indexOf(b.title);
+      final aRank = ai < 0 ? labCatalog.indexOf(a) + _order.length : ai;
+      final bRank = bi < 0 ? labCatalog.indexOf(b) + _order.length : bi;
+      return aRank.compareTo(bRank);
+    });
+    return items;
   }
 
   void _openLab(LabDefinition lab) {
@@ -327,7 +361,7 @@ class _HomeShellState extends State<HomeShell> {
   }
 
   Widget _buildExplore(BuildContext context) {
-    final labs = labCatalog.where((lab) {
+    final labs = _orderedCatalog().where((lab) {
       final matches = lab.title.toLowerCase().contains(_query.toLowerCase()) || lab.description.toLowerCase().contains(_query.toLowerCase()) || lab.category.toLowerCase().contains(_query.toLowerCase());
       return matches && (!_favoritesOnly || _favorites.contains(lab.title));
     }).toList();
@@ -353,7 +387,10 @@ class _HomeShellState extends State<HomeShell> {
         const SizedBox(height: 18),
         Row(children: [
           Text(_favoritesOnly ? 'FAVORITE LABS' : 'CAPABILITY LABS', style: Theme.of(context).textTheme.labelLarge?.copyWith(letterSpacing: 1.6,fontWeight:FontWeight.w800)),
-          const Spacer(), Text('${labs.length} labs',style:Theme.of(context).textTheme.labelMedium),
+          const Spacer(),
+          if (_query.isEmpty && !_favoritesOnly)
+            TextButton.icon(onPressed: _openReorder, icon: const Icon(Icons.reorder_rounded, size: 18), label: const Text('Reorder')),
+          Text('${labs.length} labs',style:Theme.of(context).textTheme.labelMedium),
         ]),
         const SizedBox(height: 12),
       ]))),
@@ -378,6 +415,147 @@ class _HomeShellState extends State<HomeShell> {
     const SizedBox(height:12),
     FilledButton.icon(onPressed:()=>launchUrl(Uri.https('docs.flutter.dev','')),icon:const Icon(Icons.open_in_new),label:const Text('Explore Flutter documentation')),
   ]);
+}
+
+class OnboardingPage extends StatefulWidget {
+  const OnboardingPage({required this.onComplete, super.key});
+  final VoidCallback onComplete;
+
+  @override
+  State<OnboardingPage> createState() => _OnboardingPageState();
+}
+
+class _OnboardingPageState extends State<OnboardingPage> {
+  final PageController _controller = PageController();
+  int _page = 0;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  static const _pages = [
+    (Icons.explore_rounded, 'Explore Flutter', 'Try focused, hands-on labs for UI, animation, graphics, storage and more.'),
+    (Icons.tune_rounded, 'Make it yours', 'Pick your theme, accent color and text size. Your preferences stay on this device.'),
+    (Icons.science_rounded, 'Experiment freely', 'Play with the examples, test real device features and keep your favorite labs close.'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final page = _pages[_page];
+    return Scaffold(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(28),
+          child: Column(
+            children: [
+              Align(alignment: Alignment.centerRight, child: TextButton(onPressed: widget.onComplete, child: const Text('Skip'))),
+              const Spacer(),
+              SizedBox(
+                height: 330,
+                child: PageView.builder(
+                  controller: _controller,
+                  itemCount: _pages.length,
+                  onPageChanged: (value) => setState(() => _page = value),
+                  itemBuilder: (context, index) {
+                    final item = _pages[index];
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(item.$1, size: 92, color: Theme.of(context).colorScheme.primary),
+                        const SizedBox(height: 32),
+                        Text(item.$2, textAlign: TextAlign.center, style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w900)),
+                        const SizedBox(height: 14),
+                        Text(item.$3, textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyLarge),
+                      ],
+                    );
+                  },
+                ),
+              ),
+              const Spacer(),
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: List.generate(_pages.length, (index) => AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                width: _page == index ? 24 : 8,
+                height: 8,
+                decoration: BoxDecoration(color: _page == index ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.outlineVariant, borderRadius: BorderRadius.circular(8)),
+              ))),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: () {
+                    if (_page == _pages.length - 1) {
+                      widget.onComplete();
+                    } else {
+                      _controller.nextPage(duration: const Duration(milliseconds: 260), curve: Curves.easeOutCubic);
+                    }
+                  },
+                  child: Text(_page == _pages.length - 1 ? 'Get started' : 'Continue'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class LabOrderPage extends StatefulWidget {
+  const LabOrderPage({required this.labs, required this.initialOrder, super.key});
+  final List<LabDefinition> labs;
+  final List<String> initialOrder;
+
+  @override
+  State<LabOrderPage> createState() => _LabOrderPageState();
+}
+
+class _LabOrderPageState extends State<LabOrderPage> {
+  late final List<LabDefinition> _labs;
+
+  @override
+  void initState() {
+    super.initState();
+    _labs = [...widget.labs];
+    _labs.sort((a, b) {
+      final ai = widget.initialOrder.indexOf(a.title);
+      final bi = widget.initialOrder.indexOf(b.title);
+      final aRank = ai < 0 ? widget.initialOrder.length + widget.labs.indexOf(a) : ai;
+      final bRank = bi < 0 ? widget.initialOrder.length + widget.labs.indexOf(b) : bi;
+      return aRank.compareTo(bRank);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(
+      title: const Text('Reorder dashboard'),
+      actions: [TextButton(onPressed: () => Navigator.pop(context, _labs.map((lab) => lab.title).toList()), child: const Text('Save'))],
+    ),
+    body: ReorderableListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: _labs.length,
+      onReorder: (oldIndex, newIndex) => setState(() {
+        if (newIndex > oldIndex) newIndex--;
+        final item = _labs.removeAt(oldIndex);
+        _labs.insert(newIndex, item);
+      }),
+      itemBuilder: (context, index) {
+        final lab = _labs[index];
+        return Card(
+          key: ValueKey(lab.title),
+          child: ListTile(
+            leading: Icon(lab.icon, color: lab.color),
+            title: Text(lab.title),
+            subtitle: Text(lab.category),
+            trailing: const Icon(Icons.drag_handle_rounded),
+          ),
+        );
+      },
+    ),
+  );
 }
 
 class LabCard extends StatelessWidget {
