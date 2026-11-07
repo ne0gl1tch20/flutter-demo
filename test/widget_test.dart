@@ -35,6 +35,7 @@ void main() {
     expect(find.text('Forms & Validation Lab'), findsOneWidget);
     expect(find.text('Drag & Drop Lab'), findsOneWidget);
     expect(find.text('Streams & Async Lab'), findsOneWidget);
+    expect(find.text('Flame Game Lab'), findsOneWidget);
   });
 
   testWidgets('a capability card opens its lab', (tester) async {
