@@ -308,9 +308,8 @@ class RunnerGame extends FlameGame with HasCollisionDetection {
 
   RunnerGame._(World gameWorld) : super(
     world: gameWorld,
-    camera: CameraComponent.withFixedResolution(
-      width: 800,
-      height: 450,
+    camera: CameraComponent(
+      viewport: MaxViewport(),
       world: gameWorld,
     ),
   );
@@ -329,6 +328,15 @@ class RunnerGame extends FlameGame with HasCollisionDetection {
 
   static const double groundY = 382;
   static const double levelEnd = 2900;
+
+  @override
+  void onGameResize(Vector2 size) {
+    super.onGameResize(size);
+    // Keep the 450-unit world height while letting the viewport use the
+    // device's full width. FixedResolutionViewport letterboxed the game
+    // into a small 16:9 box on tall or ultrawide screens.
+    if (size.y > 0) camera.viewfinder.zoom = size.y / 450;
+  }
 
   @override
   Future<void> onLoad() async {
