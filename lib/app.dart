@@ -40,9 +40,9 @@ class _FlutterLabAppState extends State<FlutterLabApp> {
     final prefs = await SharedPreferences.getInstance();
     if (!mounted) return;
     setState(() {
-      _themeMode = ThemeMode.values[prefs.getInt('settings.theme')?.clamp(0, 2) ?? 0];
-      _accentIndex = (prefs.getInt('settings.accent') ?? 0).clamp(0, _accentColors.length - 1);
-      _textScale = (prefs.getDouble('settings.textScale') ?? 1).clamp(.85, 1.3);
+      _themeMode = ThemeMode.values[(prefs.getInt('settings.theme') ?? 0).clamp(0, 2).toInt()];
+      _accentIndex = (prefs.getInt('settings.accent') ?? 0).clamp(0, _accentColors.length - 1).toInt();
+      _textScale = (prefs.getDouble('settings.textScale') ?? 1).clamp(.85, 1.3).toDouble();
       _animations = prefs.getBool('settings.animations') ?? true;
       _haptics = prefs.getBool('settings.haptics') ?? true;
     });
@@ -78,6 +78,24 @@ class _FlutterLabAppState extends State<FlutterLabApp> {
   void _setHaptics(bool value) {
     setState(() => _haptics = value);
     _save('settings.haptics', value);
+  }
+
+  void _openSettings(BuildContext context) {
+    Navigator.of(context).push(MaterialPageRoute<void>(
+      builder: (_) => SettingsPage(
+        themeMode: _themeMode,
+        accentIndex: _accentIndex,
+        textScale: _textScale,
+        animationsEnabled: _animations,
+        hapticsEnabled: _haptics,
+        onThemeChanged: _setTheme,
+        onAccentChanged: _setAccent,
+        onTextScaleChanged: _setTextScale,
+        onAnimationsChanged: _setAnimations,
+        onHapticsChanged: _setHaptics,
+        onReset: _resetSettings,
+      ),
+    ));
   }
 
   Future<void> _resetSettings() async {
@@ -130,21 +148,7 @@ class _FlutterLabAppState extends State<FlutterLabApp> {
           ThemeMode.dark => ThemeMode.light,
           ThemeMode.light => ThemeMode.system,
         }),
-        onSettingsPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(
-          builder: (_) => SettingsPage(
-            themeMode: _themeMode,
-            accentIndex: _accentIndex,
-            textScale: _textScale,
-            animationsEnabled: _animations,
-            hapticsEnabled: _haptics,
-            onThemeChanged: _setTheme,
-            onAccentChanged: _setAccent,
-            onTextScaleChanged: _setTextScale,
-            onAnimationsChanged: _setAnimations,
-            onHapticsChanged: _setHaptics,
-            onReset: _resetSettings,
-          ),
-        )),
+        onSettingsPressed: _openSettings,
       ),
     );
   }
@@ -236,7 +240,7 @@ class HomeShell extends StatefulWidget {
   const HomeShell({required this.themeMode, required this.onThemePressed, required this.onSettingsPressed, required this.animationsEnabled, required this.hapticsEnabled, super.key});
   final ThemeMode themeMode;
   final VoidCallback onThemePressed;
-  final VoidCallback onSettingsPressed;
+  final ValueChanged<BuildContext> onSettingsPressed;
   final bool animationsEnabled;
   final bool hapticsEnabled;
   @override
@@ -307,7 +311,7 @@ class _HomeShellState extends State<HomeShell> {
         ]),
         actions: [
           IconButton(tooltip: 'Cycle theme', onPressed: widget.onThemePressed, icon: Icon(switch(widget.themeMode) {ThemeMode.system=>Icons.brightness_auto,ThemeMode.dark=>Icons.dark_mode,ThemeMode.light=>Icons.light_mode})),
-          IconButton(tooltip: 'Settings', onPressed: widget.onSettingsPressed, icon: const Icon(Icons.settings_outlined)),
+          IconButton(tooltip: 'Settings', onPressed: () => widget.onSettingsPressed(context), icon: const Icon(Icons.settings_outlined)),
           const SizedBox(width: 8),
         ],
       ),
