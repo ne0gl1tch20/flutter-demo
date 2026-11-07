@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
 class AdvancedLabPage extends StatelessWidget {
@@ -273,6 +274,8 @@ class LocalizationLab extends StatefulWidget {
 
 class _LocalizationLabState extends State<LocalizationLab> {
   String _locale = 'en_US';
+  late final Future<void> _localeData = initializeDateFormatting();
+
   static const _copy = {
     'en_US': {'title': 'Welcome to Flutter Lab', 'message': 'One interface, many languages.', 'today': 'Today', 'price': 'Sample price'},
     'fil_PH': {'title': 'Maligayang pagdating sa Flutter Lab', 'message': 'Isang interface, maraming wika.', 'today': 'Ngayon', 'price': 'Halimbawang presyo'},
@@ -280,41 +283,61 @@ class _LocalizationLabState extends State<LocalizationLab> {
   };
 
   @override
-  Widget build(BuildContext context) {
-    final copy = _copy[_locale]!;
-    final date = DateFormat.yMMMMEEEEd(_locale).format(DateTime.now());
-    final price = NumberFormat.currency(locale: _locale, name: 'PHP', symbol: '₱').format(1299.50);
-    return AdvancedLabPage(
-      title: 'Localization & Formatting Lab',
-      description: 'Localization is more than translating labels. Date, number and currency formats also change with the selected locale.',
-      child: AdvancedLabPanel(
-        title: 'Locale preview',
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          SegmentedButton<String>(
-            segments: const [
-              ButtonSegment(value: 'en_US', label: Text('English')),
-              ButtonSegment(value: 'fil_PH', label: Text('Filipino')),
-              ButtonSegment(value: 'es_ES', label: Text('Español')),
-            ],
-            selected: {_locale},
-            onSelectionChanged: (value) => setState(() => _locale = value.first),
-          ),
-          const SizedBox(height: 18),
-          Text(copy['title']!, style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 6),
-          Text(copy['message']!),
-          const Divider(height: 28),
-          Text('${copy['today']}: $date'),
-          const SizedBox(height: 6),
-          Text('${copy['price']}: $price'),
-          const SizedBox(height: 10),
-          Text('Locale: $_locale', style: Theme.of(context).textTheme.labelMedium),
-        ]),
-      ),
-    );
-  }
-}
+  Widget build(BuildContext context) => FutureBuilder<void>(
+        future: _localeData,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return AdvancedLabPage(
+              title: 'Localization & Formatting Lab',
+              description: 'Locale formatting data could not be loaded.',
+              child: const Text('Date and currency formatting is unavailable. You can still switch languages safely.'),
+            );
+          }
+          if (snapshot.connectionState != ConnectionState.done) {
+            return const AdvancedLabPage(
+              title: 'Localization & Formatting Lab',
+              description: 'Preparing language and regional formatting data.',
+              child: Center(child: CircularProgressIndicator()),
+            );
+          }
 
+          final copy = _copy[_locale] ?? _copy['en_US']!;
+          final date = DateFormat.yMMMMEEEEd(_locale).format(DateTime.now());
+          final price = NumberFormat.currency(locale: _locale, name: 'PHP', symbol: '₱').format(1299.50);
+          return AdvancedLabPage(
+            title: 'Localization & Formatting Lab',
+            description: 'Localization is more than translating labels. Date, number and currency formats also change with the selected locale.',
+            child: AdvancedLabPanel(
+              title: 'Locale preview',
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                SegmentedButton<String>(
+                  segments: const [
+                    ButtonSegment(value: 'en_US', label: Text('English')),
+                    ButtonSegment(value: 'fil_PH', label: Text('Filipino')),
+                    ButtonSegment(value: 'es_ES', label: Text('Español')),
+                  ],
+                  selected: {_locale},
+                  onSelectionChanged: (value) {
+                    if (value.isEmpty || !_copy.containsKey(value.first)) return;
+                    setState(() => _locale = value.first);
+                  },
+                ),
+                const SizedBox(height: 18),
+                Text(copy['title']!, style: Theme.of(context).textTheme.titleLarge),
+                const SizedBox(height: 6),
+                Text(copy['message']!),
+                const Divider(height: 28),
+                Text('${copy['today']}: $date'),
+                const SizedBox(height: 6),
+                Text('${copy['price']}: $price'),
+                const SizedBox(height: 10),
+                Text('Locale: $_locale', style: Theme.of(context).textTheme.labelMedium),
+              ]),
+            ),
+          );
+        },
+      );
+}
 
 class FormsLab extends StatefulWidget {
   const FormsLab({super.key});
