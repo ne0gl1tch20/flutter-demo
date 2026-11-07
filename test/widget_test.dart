@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_lab/app.dart';
+import 'package:flutter_lab/features/labs/productivity_labs.dart';
 
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({'onboarding.complete': true}));
@@ -102,6 +103,14 @@ void main() {
     expect(find.text('Charts Lab'), findsOneWidget);
     expect(find.text('Developer Tools'), findsOneWidget);
     expect(find.text('Flame Game Lab'), findsOneWidget);
+    expect(find.text('Widget Studio'), findsOneWidget);
+    expect(find.text('Visual UI Builder'), findsOneWidget);
+    expect(find.text('JSON Workbench'), findsOneWidget);
+    expect(find.text('Typography Studio'), findsOneWidget);
+    expect(find.text('Code Snippet Studio'), findsOneWidget);
+    expect(find.text('Asset Inspector'), findsOneWidget);
+    expect(find.text('Workspace Manager'), findsOneWidget);
+    expect(find.text('Test Scenario Builder'), findsOneWidget);
   });
 
   testWidgets('a capability card opens its lab', (tester) async {
@@ -179,4 +188,50 @@ void main() {
     expect(find.text('Text size'), findsOneWidget);
     expect(find.text('Haptic feedback'), findsOneWidget);
   });
+  testWidgets('JSON workbench formats and validates JSON', (tester) async {
+    await tester.view.setPhysicalSize(const Size(900, 1600));
+    await tester.view.setDevicePixelRatio(1);
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const MaterialApp(home: JsonWorkbenchLab()));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Format'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Valid JSON'), findsOneWidget);
+    expect(find.text('Generated Flutter code'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('widget studio exposes live component controls', (tester) async {
+    await tester.view.setPhysicalSize(const Size(900, 1600));
+    await tester.view.setDevicePixelRatio(1);
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const MaterialApp(home: WidgetStudioLab()));
+    await tester.pumpAndSettle();
+    expect(find.text('Live preview'), findsOneWidget);
+    expect(find.text('Properties'), findsOneWidget);
+    expect(find.text('Generated Flutter code'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('visual UI builder can add and remove components', (tester) async {
+    await tester.view.setPhysicalSize(const Size(900, 1800));
+    await tester.view.setDevicePixelRatio(1);
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const MaterialApp(home: VisualBuilderLab()));
+    await tester.pumpAndSettle();
+    expect(find.text('Canvas · 3 components'), findsOneWidget);
+    await tester.tap(find.widgetWithText(ActionChip, 'Divider'));
+    await tester.pumpAndSettle();
+    expect(find.text('Canvas · 4 components'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
 }
+
+
