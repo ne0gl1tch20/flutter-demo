@@ -189,8 +189,8 @@ void main() {
     expect(find.text('Haptic feedback'), findsOneWidget);
   });
   testWidgets('JSON workbench formats and validates JSON', (tester) async {
-    await tester.view.setPhysicalSize(const Size(900, 1600));
-    await tester.view.setDevicePixelRatio(1);
+    tester.view.physicalSize = const Size(900, 1600);
+    tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
@@ -218,7 +218,7 @@ void main() {
   });
 
   testWidgets('visual UI builder can add and remove components', (tester) async {
-    await tester.view.setPhysicalSize(const Size(900, 1800));
+    tester.view.physicalSize = const Size(900, 1800);
     await tester.view.setDevicePixelRatio(1);
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
