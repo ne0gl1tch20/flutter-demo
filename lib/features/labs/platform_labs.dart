@@ -299,7 +299,7 @@ class _AudioLabState extends State<AudioLab> {
           _totalBytes = totalBytes;
           _status = totalBytes == null
               ? 'Downloading sample…'
-              : 'Downloading sample… 0%',
+              : 'Downloading sample… 0%';
         });
       }
 
