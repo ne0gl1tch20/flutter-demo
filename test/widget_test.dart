@@ -60,6 +60,30 @@ void main() {
     expect(find.text('Live controls'), findsOneWidget);
   });
 
+  testWidgets('locale lab safely switches date and currency formatting', (tester) async {
+    tester.view.physicalSize = const Size(1200, 2400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const FlutterLabApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Localization & Formatting Lab'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Welcome to Flutter Lab'), findsOneWidget);
+    await tester.tap(find.text('Filipino'));
+    await tester.pumpAndSettle();
+    expect(find.text('Maligayang pagdating sa Flutter Lab'), findsOneWidget);
+    expect(find.textContaining('Locale: fil_PH'), findsOneWidget);
+
+    await tester.tap(find.text('Español'));
+    await tester.pumpAndSettle();
+    expect(find.text('Te damos la bienvenida a Flutter Lab'), findsOneWidget);
+    expect(find.textContaining('Locale: es_ES'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('settings screen exposes appearance and behavior controls', (tester) async {
     tester.view.physicalSize = const Size(800, 1400);
     tester.view.devicePixelRatio = 1;
