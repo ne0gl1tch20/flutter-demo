@@ -4,6 +4,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:share_plus/share_plus.dart';
@@ -241,29 +242,109 @@ class AudioLab extends StatefulWidget {
 }
 
 class _AudioLabState extends State<AudioLab> {
+  static final Uri _sampleUri = Uri.parse(
+    'https://actions.google.com/sounds/v1/cartoon/pop.ogg',
+  );
+
   final AudioPlayer _player = AudioPlayer();
   bool _loading = false;
   bool _playing = false;
-  String _status = 'Ready to play a short online audio sample.';
+  double? _downloadProgress;
+  int _downloadedBytes = 0;
+  int? _totalBytes;
+  String _status = 'Ready to download a short online audio sample.';
+
+  String _formatBytes(int bytes) {
+    if (bytes < 1024) return '$bytes B';
+    if (bytes < 1024 * 1024) {
+      return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    }
+    return '${(bytes / (1024 * 1024)).toStringAsFixed(2)} MB';
+  }
 
   Future<void> _play() async {
     setState(() {
       _loading = true;
-      _status = 'Loading audio…';
+      _playing = false;
+      _downloadProgress = 0;
+      _downloadedBytes = 0;
+      _totalBytes = null;
+      _status = 'Connecting to sample…';
     });
+
+    final client = HttpClient()
+      ..connectionTimeout = const Duration(seconds: 15);
+    File? sampleFile;
+
     try {
-      await _player.play(
-        UrlSource('https://actions.google.com/sounds/v1/cartoon/pop.ogg'),
-      );
+      final request = await client.getUrl(_sampleUri);
+      final response = await request.close();
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        throw HttpException(
+          'Sample server returned HTTP ${response.statusCode}.',
+          uri: _sampleUri,
+        );
+      }
+
+      final totalBytes = response.contentLength > 0
+          ? response.contentLength
+          : null;
+      final directory = await getTemporaryDirectory();
+      sampleFile = File('${directory.path}/flutter_lab_audio_sample.ogg');
+      final sink = sampleFile.openWrite();
+      var downloadedBytes = 0;
+
+      if (mounted) {
+        setState(() {
+          _totalBytes = totalBytes;
+          _status = totalBytes == null
+              ? 'Downloading sample…'
+              : 'Downloading sample… 0%',
+        });
+      }
+
+      try {
+        await for (final chunk in response) {
+          sink.add(chunk);
+          downloadedBytes += chunk.length;
+          if (mounted) {
+            setState(() {
+              _downloadedBytes = downloadedBytes;
+              _downloadProgress = totalBytes == null
+                  ? null
+                  : (downloadedBytes / totalBytes).clamp(0.0, 1.0);
+              _status = totalBytes == null
+                  ? 'Downloaded ${_formatBytes(downloadedBytes)}'
+                  : 'Downloading sample… ${(_downloadProgress! * 100).round()}%';
+            });
+          }
+        }
+      } finally {
+        await sink.flush();
+        await sink.close();
+      }
+
+      if (!mounted) return;
+      setState(() {
+        _downloadProgress = 1;
+        _downloadedBytes = downloadedBytes;
+        _status = 'Download complete. Starting playback…';
+      });
+
+      await _player.play(DeviceFileSource(sampleFile.path));
       if (mounted) {
         setState(() {
           _playing = true;
-          _status = 'Playing sample audio.';
+          _status = 'Playing downloaded sample audio.';
         });
       }
     } catch (error) {
       if (mounted) setState(() => _status = 'Audio failed: $error');
+      if (sampleFile != null && await sampleFile.exists()) {
+        await sampleFile.delete();
+      }
     } finally {
+      client.close(force: true);
       if (mounted) setState(() => _loading = false);
     }
   }
@@ -288,7 +369,7 @@ class _AudioLabState extends State<AudioLab> {
   Widget build(BuildContext context) => PlatformLabPage(
         title: 'Audio Lab',
         description:
-            'Play and stop a short sound over HTTPS using an audio plugin. Internet access is required.',
+            'Download a short sound over HTTPS with live transfer progress, then play it locally. Internet access is required.',
         child: PlatformLabCardPanel(
           title: 'Audio playback',
           child: Column(
@@ -297,6 +378,21 @@ class _AudioLabState extends State<AudioLab> {
               const Icon(Icons.graphic_eq_rounded, size: 54),
               const SizedBox(height: 12),
               Text(_status),
+              if (_loading || _downloadProgress != null) ...[
+                const SizedBox(height: 12),
+                LinearProgressIndicator(
+                  value: _downloadProgress,
+                  minHeight: 7,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  _totalBytes == null
+                      ? _formatBytes(_downloadedBytes)
+                      : '${_formatBytes(_downloadedBytes)} / ${_formatBytes(_totalBytes!)}',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
               const SizedBox(height: 12),
               Wrap(
                 spacing: 8,
@@ -304,7 +400,7 @@ class _AudioLabState extends State<AudioLab> {
                   FilledButton.icon(
                     onPressed: _loading ? null : _play,
                     icon: const Icon(Icons.play_arrow),
-                    label: Text(_loading ? 'Loading…' : 'Play sample'),
+                    label: Text(_loading ? 'Downloading…' : 'Download & play'),
                   ),
                   OutlinedButton.icon(
                     onPressed: _playing ? _stop : null,
