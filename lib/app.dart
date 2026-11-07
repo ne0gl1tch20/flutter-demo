@@ -325,6 +325,70 @@ class _HomeShellState extends State<HomeShell> {
     return items;
   }
 
+  Future<void> _openCommandPalette() async {
+    final controller = TextEditingController();
+    var query = '';
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setDialogState) {
+          final matches = labCatalog.where((lab) {
+            final q = query.toLowerCase();
+            return lab.title.toLowerCase().contains(q) ||
+                lab.description.toLowerCase().contains(q) ||
+                lab.category.toLowerCase().contains(q);
+          }).toList();
+          return AlertDialog(
+            title: const Text('Command palette'),
+            content: SizedBox(
+              width: 520,
+              height: 440,
+              child: Column(children: [
+                TextField(
+                  controller: controller,
+                  autofocus: true,
+                  decoration: const InputDecoration(
+                    prefixIcon: Icon(Icons.search),
+                    hintText: 'Find a lab or tool…',
+                    border: OutlineInputBorder(),
+                  ),
+                  onChanged: (value) => setDialogState(() => query = value),
+                ),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: matches.isEmpty
+                      ? const Center(child: Text('No matching tools.'))
+                      : ListView.builder(
+                          itemCount: matches.length,
+                          itemBuilder: (context, index) {
+                            final lab = matches[index];
+                            return ListTile(
+                              leading: Icon(lab.icon, color: lab.color),
+                              title: Text(lab.title),
+                              subtitle: Text(lab.category),
+                              onTap: () {
+                                Navigator.pop(dialogContext);
+                                _openLab(lab);
+                              },
+                            );
+                          },
+                        ),
+                ),
+              ]),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: const Text('Close'),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+    controller.dispose();
+  }
+
   void _openLab(LabDefinition lab) {
     if (widget.hapticsEnabled) HapticFeedback.selectionClick();
     _recordRecent(lab.title);
@@ -351,6 +415,7 @@ class _HomeShellState extends State<HomeShell> {
           Text('Flutter Lab', style: TextStyle(fontWeight: FontWeight.w800)),
         ]),
         actions: [
+          IconButton(tooltip: 'Command palette', onPressed: _openCommandPalette, icon: const Icon(Icons.search_rounded)),
           IconButton(tooltip: 'Cycle theme', onPressed: widget.onThemePressed, icon: Icon(switch(widget.themeMode) {ThemeMode.system=>Icons.brightness_auto,ThemeMode.dark=>Icons.dark_mode,ThemeMode.light=>Icons.light_mode})),
           IconButton(tooltip: 'Settings', onPressed: () => widget.onSettingsPressed(context), icon: const Icon(Icons.settings_outlined)),
           const SizedBox(width: 8),
