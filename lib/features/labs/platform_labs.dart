@@ -644,7 +644,13 @@ class _DownloadQueueLabState extends State<DownloadQueueLab> {
                   ),
                   const SizedBox(height: 6),
                   LinearProgressIndicator(
-                    value: item.status == 'Completed' ? 1 : item.total > 0 ? (item.downloaded / item.total).clamp(0, 1) : null,
+                    value: item.status == 'Downloading' && item.total <= 0
+                        ? null
+                        : item.status == 'Completed'
+                            ? 1
+                            : item.total > 0
+                                ? (item.downloaded / item.total).clamp(0, 1)
+                                : 0,
                   ),
                   if (item.error != null) ...[
                     const SizedBox(height: 6),
