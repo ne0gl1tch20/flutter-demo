@@ -28,6 +28,25 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('returning users wait for saved preferences before showing the home screen', (tester) async {
+    SharedPreferences.setMockInitialValues({
+      'onboarding.complete': true,
+      'settings.theme': 2,
+    });
+    tester.view.physicalSize = const Size(900, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const FlutterLabApp());
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Build. Explore. Experiment.'), findsOneWidget);
+    expect(find.text('Explore Flutter'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('dashboard order editor opens and saves custom order', (tester) async {
     tester.view.physicalSize = const Size(1200, 2400);
     tester.view.devicePixelRatio = 1;
