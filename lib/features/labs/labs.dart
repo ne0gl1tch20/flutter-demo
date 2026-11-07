@@ -7,6 +7,7 @@ import 'advanced_labs.dart';
 import 'extra_labs.dart';
 import 'flame_lab.dart';
 import 'platform_labs.dart';
+import 'productivity_labs.dart';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
@@ -61,6 +62,14 @@ final labCatalog = <LabDefinition>[
   LabDefinition(title: 'Charts Lab', description: 'Interactive bar, line and pie charts with live values.', category: 'Data', icon: Icons.insert_chart_rounded, color: const Color(0xFF73B7FF), builder: (_) => const ChartsLab()),
   LabDefinition(title: 'Developer Tools', description: 'Runtime information, diagnostic console and copyable logs.', category: 'Developer', icon: Icons.terminal_rounded, color: const Color(0xFFB9A1FF), builder: (_) => const DeveloperToolsLab()),
   LabDefinition(title: 'Flame Game Lab', description: 'A complete 2D platformer with physics, camera, collisions, enemies and touch controls.', category: 'Game Development', icon: Icons.sports_esports_rounded, color: const Color(0xFFFFD166), builder: (_) => const FlamePlatformerLab()),
+  LabDefinition(title: 'Widget Studio', description: 'Configure real widgets, preview states and copy generated Dart.', category: 'UI', icon: Icons.tune_rounded, color: const Color(0xFF9B8CFF), builder: (_) => const WidgetStudioLab()),
+  LabDefinition(title: 'Visual UI Builder', description: 'Arrange, edit and reorder a widget tree with generated Flutter code.', category: 'UI', icon: Icons.dashboard_customize_rounded, color: const Color(0xFF75E0C1), builder: (_) => const VisualBuilderLab()),
+  LabDefinition(title: 'JSON Workbench', description: 'Format, minify and validate JSON completely offline.', category: 'Developer', icon: Icons.data_object_rounded, color: const Color(0xFF73B7FF), builder: (_) => const JsonWorkbenchLab()),
+  LabDefinition(title: 'Typography Studio', description: 'Experiment with text styles, sizing, line height and spacing.', category: 'Design', icon: Icons.text_fields_rounded, color: const Color(0xFFFFA7C8), builder: (_) => const TypographyLab()),
+  LabDefinition(title: 'Code Snippet Studio', description: 'Edit, save, organize and copy reusable Dart snippets.', category: 'Developer', icon: Icons.code_rounded, color: const Color(0xFFB9A1FF), builder: (_) => const CodeSnippetLab()),
+  LabDefinition(title: 'Asset Inspector', description: 'Preview local images and inspect their dimensions and file size.', category: 'Assets', icon: Icons.image_search_rounded, color: const Color(0xFFFFC66D), builder: (_) => const AssetInspectorLab()),
+  LabDefinition(title: 'Workspace Manager', description: 'Keep project notes in separate workspaces and transfer JSON backups.', category: 'Productivity', icon: Icons.workspaces_rounded, color: const Color(0xFF80D6A8), builder: (_) => const WorkspaceLab()),
+  LabDefinition(title: 'Test Scenario Builder', description: 'Create reusable manual QA checklists and track test progress.', category: 'Testing', icon: Icons.fact_check_rounded, color: const Color(0xFFFF8A50), builder: (_) => const TestScenarioLab()),
 ];
 
 class LabPage extends StatelessWidget {
