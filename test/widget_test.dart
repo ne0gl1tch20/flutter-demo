@@ -204,7 +204,7 @@ void main() {
   });
 
   testWidgets('widget studio exposes live component controls', (tester) async {
-    tester.view.physicalSize = const Size(900, 1600));
+    tester.view.physicalSize = const Size(900, 1600);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
