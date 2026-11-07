@@ -81,6 +81,7 @@ class _FlamePlatformerLabState extends State<FlamePlatformerLab> {
       ),
       body: Focus(
         autofocus: true,
+        onFocusChange: (focused) { if (!focused) _game.setDirection(0); },
         onKeyEvent: _onKey,
         child: Stack(
           fit: StackFit.expand,
