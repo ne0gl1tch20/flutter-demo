@@ -513,6 +513,7 @@ class _DownloadQueueLabState extends State<DownloadQueueLab> {
   Future<void> _download(_DownloadQueueItem item) async {
     HttpClient? client;
     IOSink? sink;
+    File? partialFile;
     try {
       setState(() {
         item.status = 'Downloading';
@@ -534,8 +535,10 @@ class _DownloadQueueLabState extends State<DownloadQueueLab> {
       final rawName = uri.pathSegments.isEmpty ? 'download_${item.id}' : Uri.decodeComponent(uri.pathSegments.last);
       final safeName = rawName.replaceAll(RegExp(r'[^A-Za-z0-9._-]'), '_');
       final file = File('${downloadDirectory.path}/${item.id}_$safeName');
+      partialFile = file;
       sink = file.openWrite();
-      await for (final chunk in response) {
+      // Treat a stalled response body as a failed download instead of waiting forever.
+      await for (final chunk in response.timeout(const Duration(seconds: 60))) {
         sink.add(chunk);
         item.downloaded += chunk.length;
         if (mounted) setState(() {});
@@ -543,9 +546,21 @@ class _DownloadQueueLabState extends State<DownloadQueueLab> {
       await sink.flush();
       await sink.close();
       sink = null;
+      partialFile = null;
       if (mounted) setState(() => item.status = 'Completed');
     } catch (error) {
-      await sink?.close();
+      try {
+        await sink?.close();
+      } catch (_) {
+        // Preserve the original download error while still attempting cleanup.
+      }
+      if (partialFile != null) {
+        try {
+          if (await partialFile.exists()) await partialFile.delete();
+        } catch (_) {
+          // Temporary-file cleanup is best-effort; the download remains failed.
+        }
+      }
       if (mounted) {
         setState(() {
           item.status = 'Failed';
