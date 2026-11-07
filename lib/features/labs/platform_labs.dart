@@ -252,6 +252,8 @@ class _AudioLabState extends State<AudioLab> {
   double? _downloadProgress;
   int _downloadedBytes = 0;
   int? _totalBytes;
+  double _playbackRate = 1;
+  bool _loop = false;
   String _status = 'Ready to download a short online audio sample.';
 
   String _formatBytes(int bytes) {
@@ -331,6 +333,8 @@ class _AudioLabState extends State<AudioLab> {
         _status = 'Download complete. Starting playback…';
       });
 
+      await _player.setReleaseMode(_loop ? ReleaseMode.loop : ReleaseMode.release);
+      await _player.setPlaybackRate(_playbackRate);
       await _player.play(DeviceFileSource(sampleFile.path));
       if (mounted) {
         setState(() {
@@ -367,9 +371,9 @@ class _AudioLabState extends State<AudioLab> {
 
   @override
   Widget build(BuildContext context) => PlatformLabPage(
-        title: 'Audio Lab',
+        title: 'Audio Lab 2.0',
         description:
-            'Download a short sound over HTTPS with live transfer progress, then play it locally. Internet access is required.',
+            'Download and play a sample with transfer progress, playback speed, looping and a live visualizer. Internet access is required.',
         child: PlatformLabCardPanel(
           title: 'Audio playback',
           child: Column(
@@ -377,7 +381,37 @@ class _AudioLabState extends State<AudioLab> {
             children: [
               const Icon(Icons.graphic_eq_rounded, size: 54),
               const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(25, (index) => Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 2),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 180),
+                    width: 5,
+                    height: _playing ? 12 + ((index * 17 + _downloadedBytes) % 31).toDouble() : 8 + (index % 4) * 3.0,
+                    decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary, borderRadius: BorderRadius.circular(8)),
+                  ),
+                )),
+              ),
+              const SizedBox(height: 12),
               Text(_status),
+              Row(children: [
+                const Text('Speed'),
+                Expanded(child: Slider(value: _playbackRate, min: .5, max: 2, divisions: 6, label: '${_playbackRate.toStringAsFixed(2)}×', onChanged: (value) {
+                  setState(() => _playbackRate = value);
+                  if (_playing) _player.setPlaybackRate(value);
+                })),
+                Text('${_playbackRate.toStringAsFixed(2)}×'),
+              ]),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Loop playback'),
+                value: _loop,
+                onChanged: (value) async {
+                  setState(() => _loop = value);
+                  await _player.setReleaseMode(value ? ReleaseMode.loop : ReleaseMode.release);
+                },
+              ),
               if (_loading || _downloadProgress != null) ...[
                 const SizedBox(height: 12),
                 LinearProgressIndicator(

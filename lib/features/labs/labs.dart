@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:math' as math;
 
 import 'advanced_labs.dart';
+import 'extra_labs.dart';
 import 'flame_lab.dart';
 import 'platform_labs.dart';
 
@@ -46,7 +47,7 @@ final labCatalog = <LabDefinition>[
   LabDefinition(title: 'Accessibility Lab', description: 'Semantics, scalable text and accessible controls.', category: 'Accessibility', icon: Icons.accessibility_new_rounded, color: const Color(0xFFFFA7C8), builder: (_) => const AccessibilityLab()),
   LabDefinition(title: 'Performance Lab', description: 'Rebuild counters, repaint boundaries and frame budgets.', category: 'Performance', icon: Icons.speed_rounded, color: const Color(0xFFFFD166), builder: (_) => const PerformanceLab()),
   LabDefinition(title: 'Platform Tools', description: 'Camera, gallery, files, sharing, clipboard and haptics.', category: 'Platform', icon: Icons.phone_android_rounded, color: const Color(0xFF8ED7B2), builder: (_) => const PlatformExtrasLab()),
-  LabDefinition(title: 'Audio Lab', description: 'Play and control audio using a Flutter plugin.', category: 'Media', icon: Icons.graphic_eq_rounded, color: const Color(0xFFFFA875), builder: (_) => const AudioLab()),
+  LabDefinition(title: 'Audio Lab 2.0', description: 'Download, visualize, loop and control audio playback speed.', category: 'Media', icon: Icons.graphic_eq_rounded, color: const Color(0xFFFFA875), builder: (_) => const AudioLab()),
   LabDefinition(title: 'Notifications Lab', description: 'Request permission and send local Android notifications.', category: 'Platform', icon: Icons.notifications_active_rounded, color: const Color(0xFFFFD166), builder: (_) => const NotificationsLab()),
   LabDefinition(title: 'Concurrency Lab', description: 'Run CPU-heavy work on a background Dart isolate.', category: 'Performance', icon: Icons.memory_rounded, color: const Color(0xFF7EB8FF), builder: (_) => const IsolateLab()),
   LabDefinition(title: 'App Lifecycle Lab', description: 'Observe app pause, resume and lifecycle events.', category: 'Platform', icon: Icons.sync_rounded, color: const Color(0xFF80D6A8), builder: (_) => const LifecycleLab()),
@@ -55,6 +56,9 @@ final labCatalog = <LabDefinition>[
   LabDefinition(title: 'Forms & Validation Lab', description: 'Build forms with input types, validation and focus handling.', category: 'Input', icon: Icons.assignment_rounded, color: const Color(0xFF9B8CFF), builder: (_) => const FormsLab()),
   LabDefinition(title: 'Drag & Drop Lab', description: 'Reorder lists and move draggable widgets into drop targets.', category: 'Interaction', icon: Icons.open_with_rounded, color: const Color(0xFF75E0C1), builder: (_) => const DragDropLab()),
   LabDefinition(title: 'Streams & Async Lab', description: 'Receive asynchronous events and render them with StreamBuilder.', category: 'State', icon: Icons.stream_rounded, color: const Color(0xFF7EB8FF), builder: (_) => const StreamsLab()),
+  LabDefinition(title: 'Canvas Lab', description: 'Draw with custom canvas, brush colors, undo and redo.', category: 'Graphics', icon: Icons.draw_rounded, color: const Color(0xFFFF82AD), builder: (_) => const CanvasLab()),
+  LabDefinition(title: 'Charts Lab', description: 'Interactive bar, line and pie charts with live values.', category: 'Data', icon: Icons.insert_chart_rounded, color: const Color(0xFF73B7FF), builder: (_) => const ChartsLab()),
+  LabDefinition(title: 'Developer Tools', description: 'Runtime information, diagnostic console and copyable logs.', category: 'Developer', icon: Icons.terminal_rounded, color: const Color(0xFFB9A1FF), builder: (_) => const DeveloperToolsLab()),
   LabDefinition(title: 'Flame Game Lab', description: 'A complete 2D platformer with physics, camera, collisions, enemies and touch controls.', category: 'Game Development', icon: Icons.sports_esports_rounded, color: const Color(0xFFFFD166), builder: (_) => const FlamePlatformerLab()),
 ];
 

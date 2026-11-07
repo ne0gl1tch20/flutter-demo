@@ -8,6 +8,9 @@ An interactive playground for exploring Flutter capabilities on Android and Wind
 - **Animation Studio** — implicit animations, animation controllers and curves.
 - **Gesture Lab** — taps, long presses, dragging and scaling.
 - **Graphics Lab** — Canvas, gradients and CustomPainter.
+- **Canvas Lab** — freehand drawing with brush colors, undo, redo and clear.
+- **Charts Lab** — interactive bar, line and pie charts.
+- **Developer Tools** — runtime information and a copyable diagnostic console.
 - **Adaptive Layout** — LayoutBuilder, MediaQuery and responsive grids.
 - **Navigation Lab** — page transitions, dialogs, bottom sheets and nested page state.
 - **State Lab** — setState, ValueNotifier and streams.
@@ -17,7 +20,7 @@ An interactive playground for exploring Flutter capabilities on Android and Wind
 - **Accessibility Lab** — Semantics, scalable text and high-contrast previews.
 - **Performance Lab** — rebuild counters, RepaintBoundary and custom-painted particles.
 - **Platform Tools** — camera/gallery capture, file picking, sharing, clipboard and haptics.
-- **Audio Lab** — online audio playback and stop controls.
+- **Audio Lab 2.0** — streamed download progress, waveform-style playback visualization, playback speed and looping.
 - **Notifications Lab** — Android notification permission and local notifications.
 - **Concurrency Lab** — CPU-heavy prime counting on a background Dart isolate.
 - **App Lifecycle Lab** — observe pause, resume and other lifecycle transitions.
@@ -26,6 +29,13 @@ An interactive playground for exploring Flutter capabilities on Android and Wind
 - **Forms & Validation Lab** — form state, input types, validation and focus handling.
 - **Drag & Drop Lab** — draggable widgets, drop targets and reorderable lists.
 - **Streams & Async Lab** — asynchronous event streams and StreamBuilder.
+
+## App settings and quality of life
+
+- Persistent system/light/dark theme, accent color and text scaling.
+- Animation and haptic feedback toggles.
+- Favorites and recently opened labs saved locally.
+- Search across the capability catalog and filter favorite labs.
 
 ## Flame game lab
 
