@@ -30,6 +30,7 @@ class _FlutterLabAppState extends State<FlutterLabApp> {
   bool _animations = true;
   bool _haptics = true;
   bool _onboardingComplete = false;
+  bool _settingsLoaded = false;
 
   @override
   void initState() {
@@ -38,16 +39,20 @@ class _FlutterLabAppState extends State<FlutterLabApp> {
   }
 
   Future<void> _loadSettings() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (!mounted) return;
-    setState(() {
-      _themeMode = ThemeMode.values[(prefs.getInt('settings.theme') ?? 0).clamp(0, 2).toInt()];
-      _accentIndex = (prefs.getInt('settings.accent') ?? 0).clamp(0, _accentColors.length - 1).toInt();
-      _textScale = (prefs.getDouble('settings.textScale') ?? 1).clamp(.85, 1.3).toDouble();
-      _animations = prefs.getBool('settings.animations') ?? true;
-      _haptics = prefs.getBool('settings.haptics') ?? true;
-      _onboardingComplete = prefs.getBool('onboarding.complete') ?? false;
-    });
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (!mounted) return;
+      setState(() {
+        _themeMode = ThemeMode.values[(prefs.getInt('settings.theme') ?? 0).clamp(0, 2).toInt()];
+        _accentIndex = (prefs.getInt('settings.accent') ?? 0).clamp(0, _accentColors.length - 1).toInt();
+        _textScale = (prefs.getDouble('settings.textScale') ?? 1).clamp(.85, 1.3).toDouble();
+        _animations = prefs.getBool('settings.animations') ?? true;
+        _haptics = prefs.getBool('settings.haptics') ?? true;
+        _onboardingComplete = prefs.getBool('onboarding.complete') ?? false;
+      });
+    } finally {
+      if (mounted) setState(() => _settingsLoaded = true);
+    }
   }
 
   Future<void> _completeOnboarding() async {
@@ -147,7 +152,9 @@ class _FlutterLabAppState extends State<FlutterLabApp> {
         data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(_textScale)),
         child: child ?? const SizedBox.shrink(),
       ),
-      home: _onboardingComplete
+      home: !_settingsLoaded
+          ? const Scaffold(body: Center(child: CircularProgressIndicator()))
+          : _onboardingComplete
           ? HomeShell(
         themeMode: _themeMode,
         animationsEnabled: _animations,
