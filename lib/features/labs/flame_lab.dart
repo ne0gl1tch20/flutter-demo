@@ -565,7 +565,7 @@ class _RunnerPlayer extends SpriteComponent with HasGameReference<RunnerGame> {
     }
     if (owner.direction != 0 && (owner.direction < 0) != _facingLeft) {
       _facingLeft = owner.direction < 0;
-      flipHorizontally(_facingLeft);
+      flipHorizontally();
     }
   }
 }
