@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -134,7 +135,7 @@ class _VisualBuilderLabState extends State<VisualBuilderLab> {
                     const Icon(Icons.drag_indicator),
                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Text(nodes[i].type, style: Theme.of(context).textTheme.labelSmall),
-                      if (nodes[i].type != 'Divider') TextFormField(initialValue: nodes[i].label, decoration: const InputDecoration(isDense: true, border: InputBorder.none), onChanged: (v) => nodes[i].label = v),
+                      if (nodes[i].type != 'Divider') TextFormField(initialValue: nodes[i].label, decoration: const InputDecoration(isDense: true, border: InputBorder.none), onChanged: (v) => setState(() => nodes[i].label = v)),
                       nodePreview(nodes[i]),
                     ])),
                     IconButton(onPressed: () => setState(() => nodes.removeAt(i)), icon: const Icon(Icons.delete_outline)),
@@ -149,7 +150,7 @@ class _VisualBuilderLabState extends State<VisualBuilderLab> {
 }
 
 class _BuilderNode {
-  _BuilderNode(this.type, this.label) : id = DateTime.now().microsecondsSinceEpoch.toString() + _counter++.toString();
+  _BuilderNode(this.type, this.label) : id = DateTime.now().microsecondsSinceEpoch.toString() + (_counter++).toString();
   static int _counter = 0;
   final String id;
   final String type;
@@ -343,7 +344,7 @@ class _AssetInspectorLabState extends State<AssetInspectorLab> {
         setState(() => details = 'This provider did not return image bytes. Try another image.');
         return;
       }
-      final codec = await instantiateImageCodec(file.bytes!);
+      final codec = await ui.instantiateImageCodec(file.bytes!);
       final frame = await codec.getNextFrame();
       codec.dispose();
       if (!mounted) return;
@@ -393,7 +394,7 @@ class _WorkspaceLabState extends State<WorkspaceLab> {
   Future<void> load() async {
     final p = await SharedPreferences.getInstance();
     try { workspaces = (jsonDecode(p.getString('workspaces.data') ?? '[]') as List).map((e) => Map<String, dynamic>.from(e as Map)).toList(); } catch (_) { workspaces = []; }
-    active = (p.getInt('workspaces.active') ?? 0).clamp(0, workspaces.isEmpty ? 0 : workspaces.length - 1);
+    active = (p.getInt('workspaces.active') ?? 0).clamp(0, workspaces.isEmpty ? 0 : workspaces.length - 1).toInt();
     if (mounted) setState(() { if (workspaces.isNotEmpty) notes.text = workspaces[active]['notes'] as String? ?? ''; });
   }
   Future<void> persist() async {
@@ -441,7 +442,7 @@ class _WorkspaceLabState extends State<WorkspaceLab> {
       final imported = (data['workspaces'] as List).map((e) => Map<String, dynamic>.from(e as Map)).toList();
       if (imported.any((e) => e['name'] is! String || e['notes'] is! String)) throw const FormatException('Invalid workspace entry');
       workspaces = imported;
-      active = (data['active'] as int? ?? 0).clamp(0, workspaces.isEmpty ? 0 : workspaces.length - 1);
+      active = (data['active'] as int? ?? 0).clamp(0, workspaces.isEmpty ? 0 : workspaces.length - 1).toInt();
       notes.text = workspaces.isEmpty ? '' : workspaces[active]['notes'] as String;
       await persist();
       if (mounted) setState(() => status = 'Imported ' + workspaces.length.toString() + ' workspace(s).');
@@ -479,7 +480,7 @@ class _WorkspaceLabState extends State<WorkspaceLab> {
                 FilledButton(onPressed: () => Navigator.pop(c, true), child: const Text('Delete')),
               ]));
               if (ok != true) return;
-              setState(() { workspaces.removeAt(active); active = active.clamp(0, workspaces.isEmpty ? 0 : workspaces.length - 1); notes.text = workspaces.isEmpty ? '' : workspaces[active]['notes'] as String; });
+              setState(() { workspaces.removeAt(active); active = active.clamp(0, workspaces.isEmpty ? 0 : workspaces.length - 1).toInt(); notes.text = workspaces.isEmpty ? '' : workspaces[active]['notes'] as String; });
               await persist();
             }, icon: const Icon(Icons.delete_outline), label: const Text('Delete')),
           ]),
@@ -566,7 +567,7 @@ class _StudioSlider extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
     Row(children: [Expanded(child: Text(label)), Text(value.toStringAsFixed(1))]),
-    Slider(value: value.clamp(min, max), min: min, max: max, onChanged: onChanged),
+    Slider(value: value.clamp(min, max).toDouble(), min: min, max: max, onChanged: onChanged),
   ]);
 }
 
