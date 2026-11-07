@@ -629,7 +629,8 @@ class _Slime extends SpriteComponent with HasGameReference<RunnerGame> {
 
 class _Sky extends PositionComponent {
   _Sky() {
-    // Paint beyond the playable world so the camera never exposes black gutters.\n    size = Vector2(20000, 3000);
+    // Paint beyond the playable world so the camera never exposes black gutters.
+    size = Vector2(20000, 3000);
   }
 
   @override
