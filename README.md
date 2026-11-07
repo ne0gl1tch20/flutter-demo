@@ -41,6 +41,22 @@ An interactive playground for exploring Flutter capabilities on Android and Wind
 - Favorites and recently opened labs saved locally.
 - Search across the capability catalog and filter favorite labs.
 
+## Expanded developer workspace
+
+The app now also includes a set of practical tools for building and reviewing Flutter interfaces:
+
+- **Command palette** — search the complete lab catalog from one quick-open dialog.
+- **Widget Studio** — configure a Material widget, preview it and copy generated Dart.
+- **Visual UI Builder** — add, edit and reorder a small widget tree, then copy its Flutter layout.
+- **JSON Workbench** — validate, pretty-print and minify JSON offline.
+- **Typography Studio** — tune font size, weight, line height and letter spacing.
+- **Code Snippet Studio** — edit, save, reopen and copy Dart snippets locally. It does not execute arbitrary code.
+- **Asset Inspector** — pick an image and inspect its dimensions, size and preview.
+- **Workspace Manager** — keep project notes in separate local workspaces and copy/import a versioned JSON backup between devices.
+- **Test Scenario Builder** — create manual QA checklists and track completion.
+
+These tools work offline except for existing network/download examples. Workspace transfer is a manual export/import workflow, not automatic cloud synchronization. Flutter Lab does not execute arbitrary terminal commands or dynamically load third-party Dart plugins.
+
 ## Flame game lab
 
 The **Flame Game Lab** is a playable side-scrolling platformer built with the Flame engine. It includes a fixed-resolution game camera, player movement and jumping, platform landing, coin collection, patrolling enemies, health, pause/restart states and mobile touch controls plus keyboard input on desktop. Kenney Platformer Art Deluxe sprites are included under `assets/images/flame/` (CC0).
