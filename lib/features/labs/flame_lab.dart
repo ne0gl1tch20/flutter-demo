@@ -332,7 +332,6 @@ class RunnerGame extends FlameGame with HasCollisionDetection {
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    images.prefix = 'assets/images/';
     await images.loadAll([
       'flame/player.png',
       'flame/player_walk_1.png',
@@ -392,6 +391,7 @@ class RunnerGame extends FlameGame with HasCollisionDetection {
       Vector2(2430, 195), Vector2(2630, 320),
     ]) {
       final coin = _Coin()
+        ..sprite = Sprite(images.fromCache('flame/coin.png'))
         ..position = point
         ..size = Vector2.all(30);
       _coins.add(coin);
@@ -400,6 +400,7 @@ class RunnerGame extends FlameGame with HasCollisionDetection {
 
     for (final x in [650.0, 1020.0, 1390.0, 1810.0, 2190.0, 2530.0]) {
       final slime = _Slime(this, x)
+        ..sprite = Sprite(images.fromCache('flame/slime.png'))
         ..position = Vector2(x, groundY - 34)
         ..size = Vector2(48, 34);
       _slimes.add(slime);
@@ -572,10 +573,12 @@ class _Coin extends SpriteComponent with HasGameReference<RunnerGame> {
   _Coin() : super(anchor: Anchor.topLeft, priority: 4);
   bool collected = false;
   double _time = 0;
+  double _baseY = 0;
 
   @override
   void onMount() {
     super.onMount();
+    _baseY = y;
     add(CircleHitbox());
   }
 
@@ -585,7 +588,7 @@ class _Coin extends SpriteComponent with HasGameReference<RunnerGame> {
     if (collected) return;
     _time += dt;
     angle = math.sin(_time * 4) * .12;
-    y += math.sin(_time * 3) * .12;
+    y = _baseY + math.sin(_time * 3) * 4;
   }
 }
 
@@ -614,6 +617,10 @@ class _Slime extends SpriteComponent with HasGameReference<RunnerGame> {
 }
 
 class _Sky extends PositionComponent {
+  _Sky() {
+    size = Vector2(2900, 450);
+  }
+
   @override
   void render(Canvas canvas) {
     final rect = Rect.fromLTWH(0, 0, RunnerGame.levelEnd, 450);
