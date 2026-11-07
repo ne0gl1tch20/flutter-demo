@@ -70,6 +70,7 @@ void main() {
     expect(find.text('Performance Lab'), findsOneWidget);
     expect(find.text('Platform Tools'), findsOneWidget);
     expect(find.text('Audio Lab 2.0'), findsOneWidget);
+    expect(find.text('Download Queue'), findsOneWidget);
     expect(find.text('Notifications Lab'), findsOneWidget);
     expect(find.text('Concurrency Lab'), findsOneWidget);
     expect(find.text('App Lifecycle Lab'), findsOneWidget);
@@ -97,6 +98,25 @@ void main() {
 
     expect(find.text('Button styles'), findsOneWidget);
     expect(find.text('Live controls'), findsOneWidget);
+  });
+
+  testWidgets('download queue accepts a sample and validates URLs', (tester) async {
+    tester.view.physicalSize = const Size(1000, 2200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const FlutterLabApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Download Queue'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Your download queue is empty. Add a URL to get started.'), findsOneWidget);
+    await tester.tap(find.text('Add sample'));
+    await tester.pumpAndSettle();
+    expect(find.text('1 queued item(s)'), findsOneWidget);
+    expect(find.text('Queued'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('locale lab safely switches date and currency formatting', (tester) async {
